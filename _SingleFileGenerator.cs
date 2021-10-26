@@ -1,15 +1,16 @@
 ﻿using System;
+using System.IO;
+using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using Task = System.Threading.Tasks.Task;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using System.Threading.Tasks;
-using Task = System.Threading.Tasks.Task;
-using System.Text;
-using System.Collections.Generic;
-using System.IO;
 using Microsoft.VisualStudio.Threading;
 using Community.VisualStudio.Toolkit;
+
 
 /// <summary>
 /// 
@@ -101,12 +102,18 @@ namespace XSDCustomToolVSIX
                 Write("Saving parameter file:", 5, false);
                 if (OutputGenerated) xsdParams.SaveXMLFile(); else throw new Exception("XSD.exe Failed during Execution!");
 
-                //Step 5: Evaluate the output file and generate the helper class if it is missing
-                IHelperClass HelperClassFile = GenerateHelperClass_Base.HelperClassFactory(xsdParams);
-                if (!HelperClassFile.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                //Step 5: Make Corrections to the XSD.exe file output 
+                //MakeCorrectionsToXSDexeOutputFile(xsdParams);
+
+                //Step 6: Evaluate the output file and generate the helper class if it is missing
+                if (xsdParams.XSDexeOptions.Language == XSDCustomTool_ParametersXSDexeOptionsLanguage.CS) // Only run for C# currently, as the other languages are not set up!
                 {
-                    Write("Generating helper class:", 6, false);
-                    HelperClassFile.Generate();
+                    IHelperClass HelperClassFile = GenerateHelperClass_Base.HelperClassFactory(xsdParams);
+                    if (!HelperClassFile.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                    {
+                        Write("Generating helper class:", 6, false);
+                        HelperClassFile.Generate(); 
+                    }
                 }
 
                 Write("Writing Readme File:", 7, false);
@@ -149,6 +156,81 @@ namespace XSDCustomToolVSIX
                 buffer = null;
             }
             return pcbOutput > 0 ? VSConstants.S_OK : VSConstants.E_FAIL;
+        }
+
+        /// <summary>
+        /// Read in the class file. The ParseLoop method is called from here.
+        /// This will then store the DiscoveredClasses output by the parse loop into to the DiscoveredClasses and TopLevelClass properties.
+        /// </summary>
+        private void MakeCorrectionsToXSDexeOutputFile(XSD_Instance xsdParams)
+        {
+            List<string> FileText = new List<string> { };
+            string ln;
+            bool MustCorrectAttribute = false;
+            //Read the file into memory
+            using (StreamReader rdr = xsdParams.OutputFile.OpenText())
+            {
+                do
+                {
+                    ln = rdr.ReadLine();
+                    FileText.Add(ln);
+                    if (MustCorrectAttribute)
+                    {
+                        FileText[FileText.Count - 2] = CorrectAttributeSerialization(FileText[FileText.Count - 2], FileText[FileText.Count - 1], xsdParams);
+                        MustCorrectAttribute = false;
+                    }
+                    else if (ln != null)
+                    {
+                        MustCorrectAttribute = ln.Contains("Serialization.XmlAttributeAttribute");
+                    }
+                } while (ln != null);
+            }
+
+            //Write the corrections to the generated file
+            ln = "";
+            foreach (string s in FileText)
+                ln += $"{s}\n";
+            File.WriteAllText(xsdParams.OutputFile.FullName, ln);
+        }
+
+        /// <summary>
+        /// XSD.exe by default neglects to allow for serialization of attributes. This results in &lt;Element /&gt; instead of &lt;Element attr="" /&gt; <br/>
+        /// This method is meant to be run during the ParseLoop to correct for that. It should be run as: <para/>
+        /// <code>FileText[i] = CorrectAttributeSerialization( FileText[i], FileText[i+1] );</code>
+        /// <br/> where the return string is input into the array.
+        /// </summary>
+        /// <param name="attributeLine"></param>
+        /// <param name="PropertyLine"></param>
+        /// <returns>Turns : [System.Xml.Serialization.XmlAttributeAttribute(Form=System.Xml.Schema.XmlSchemaForm.Qualified)] <br/>
+        /// into [System.Xml.Serialization.XmlAttributeAttribute(AttributeName = "AttributeNameExtractedFromPropertyLine" Form = System.Xml.Schema.XmlSchemaForm.Qualified)]</returns>
+
+        private string CorrectAttributeSerialization(string attributeLine, string PropertyLine, XSD_Instance xsdParams)
+        {
+            List<string> sp = PropertyLine.Split(' ').ToList();
+            bool Properties = xsdParams.XSDexeOptions.ClassOptions.PropertiesInsteadOfFields;
+            string PropName;
+            switch (xsdParams.XSDexeOptions.Language)
+            {
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.CS: 
+                    PropName = Properties ? sp[(sp.LastIndexOf("{") - 1)] : sp[(sp.Count - 1)].Replace(";","");
+                    return attributeLine.Replace("XmlAttributeAttribute(Form", $"XmlAttributeAttribute(AttributeName=\"{PropName}\", Form");
+
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.JS: 
+                    PropName = sp[(sp.LastIndexOf(":") - 1)];
+                    return attributeLine.Replace("XmlAttributeAttribute(Form", $"XmlAttributeAttribute(AttributeName=\"{PropName}\", Form");
+
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VJS:
+                    PropName = sp[(sp.LastIndexOf(":") - 1)];
+                    return attributeLine.Replace("XmlAttributeAttribute(Form", $"XmlAttributeAttribute(AttributeName=\"{PropName}\", Form");
+
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VB:
+                    PropName = sp[(sp.LastIndexOf("As") - 1)];
+                    return attributeLine.Replace("XmlAttributeAttribute(Form", $"XmlAttributeAttribute(AttributeName:=\"{PropName}\", Form");
+
+                default: return attributeLine;
+            }
+
+            
         }
     }
 }

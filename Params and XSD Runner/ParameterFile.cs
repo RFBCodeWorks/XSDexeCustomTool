@@ -73,11 +73,7 @@ public partial class XSDCustomTool_ParametersXSDexeOptions : object, System.Comp
     
     private XSDCustomTool_ParametersXSDexeOptionsLanguage languageField;
     
-    private bool languageFieldSpecified;
-    
     private bool noLogoField;
-    
-    private bool noLogoFieldSpecified;
     
     private bool generateClassField;
     
@@ -108,18 +104,6 @@ public partial class XSDCustomTool_ParametersXSDexeOptions : object, System.Comp
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool LanguageSpecified {
-        get {
-            return this.languageFieldSpecified;
-        }
-        set {
-            this.languageFieldSpecified = value;
-            this.RaisePropertyChanged("LanguageSpecified");
-        }
-    }
-    
-    /// <remarks/>
     public bool NoLogo {
         get {
             return this.noLogoField;
@@ -127,18 +111,6 @@ public partial class XSDCustomTool_ParametersXSDexeOptions : object, System.Comp
         set {
             this.noLogoField = value;
             this.RaisePropertyChanged("NoLogo");
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool NoLogoSpecified {
-        get {
-            return this.noLogoFieldSpecified;
-        }
-        set {
-            this.noLogoFieldSpecified = value;
-            this.RaisePropertyChanged("NoLogoSpecified");
         }
     }
     
@@ -214,18 +186,11 @@ public partial class XSDCustomTool_ParametersXSDexeOptionsClassOptions : object,
     
     private bool propertiesInsteadOfFieldsField;
     
-    private bool propertiesInsteadOfFieldsFieldSpecified;
-    
     private bool orderField;
-    
-    private bool orderFieldSpecified;
     
     private bool enableDataBindingField;
     
-    private bool enableDataBindingFieldSpecified;
-    
     /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute(Form=System.Xml.Schema.XmlSchemaForm.Qualified)]
     public bool PropertiesInsteadOfFields {
         get {
             return this.propertiesInsteadOfFieldsField;
@@ -237,19 +202,6 @@ public partial class XSDCustomTool_ParametersXSDexeOptionsClassOptions : object,
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool PropertiesInsteadOfFieldsSpecified {
-        get {
-            return this.propertiesInsteadOfFieldsFieldSpecified;
-        }
-        set {
-            this.propertiesInsteadOfFieldsFieldSpecified = value;
-            this.RaisePropertyChanged("PropertiesInsteadOfFieldsSpecified");
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute(Form=System.Xml.Schema.XmlSchemaForm.Qualified)]
     public bool Order {
         get {
             return this.orderField;
@@ -261,19 +213,6 @@ public partial class XSDCustomTool_ParametersXSDexeOptionsClassOptions : object,
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool OrderSpecified {
-        get {
-            return this.orderFieldSpecified;
-        }
-        set {
-            this.orderFieldSpecified = value;
-            this.RaisePropertyChanged("OrderSpecified");
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute(Form=System.Xml.Schema.XmlSchemaForm.Qualified)]
     public bool EnableDataBinding {
         get {
             return this.enableDataBindingField;
@@ -281,18 +220,6 @@ public partial class XSDCustomTool_ParametersXSDexeOptionsClassOptions : object,
         set {
             this.enableDataBindingField = value;
             this.RaisePropertyChanged("EnableDataBinding");
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool EnableDataBindingSpecified {
-        get {
-            return this.enableDataBindingFieldSpecified;
-        }
-        set {
-            this.enableDataBindingFieldSpecified = value;
-            this.RaisePropertyChanged("EnableDataBindingSpecified");
         }
     }
     
@@ -316,10 +243,7 @@ public partial class XSDCustomTool_ParametersXSDexeOptionsDataSetOptions : objec
     
     private bool enableLinqDataSetField;
     
-    private bool enableLinqDataSetFieldSpecified;
-    
     /// <remarks/>
-    [System.Xml.Serialization.XmlAttributeAttribute(Form=System.Xml.Schema.XmlSchemaForm.Qualified)]
     public bool EnableLinqDataSet {
         get {
             return this.enableLinqDataSetField;
@@ -327,18 +251,6 @@ public partial class XSDCustomTool_ParametersXSDexeOptionsDataSetOptions : objec
         set {
             this.enableLinqDataSetField = value;
             this.RaisePropertyChanged("EnableLinqDataSet");
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool EnableLinqDataSetSpecified {
-        get {
-            return this.enableLinqDataSetFieldSpecified;
-        }
-        set {
-            this.enableLinqDataSetFieldSpecified = value;
-            this.RaisePropertyChanged("EnableLinqDataSetSpecified");
         }
     }
     

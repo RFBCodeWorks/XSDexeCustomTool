@@ -6,8 +6,8 @@
 		  <xs:element name="XSDexeOptions" minOccurs="1" maxOccurs="1">
 			  <xs:complexType>
 				  <xs:sequence>
-					  <xs:element name="NameSpace" minOccurs="0" maxOccurs="1" type="xs:string"/>
-					  <xs:element name="Language" minOccurs="0" maxOccurs="1" >
+					  <xs:element name="NameSpace" minOccurs="1" maxOccurs="1" type="xs:string"/>
+					  <xs:element name="Language" minOccurs="1" maxOccurs="1" >
 						  <xs:simpleType>
 							  <xs:restriction base = "xs:string">
 								  <xs:enumeration value = "CS"/>
@@ -17,24 +17,28 @@
 							  </xs:restriction>
 						  </xs:simpleType>
 					  </xs:element>
-					  <xs:element name="NoLogo" minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+					  <xs:element name="NoLogo" minOccurs="1" maxOccurs="1" type="xs:boolean"/>
 					  <xs:element name="GenerateClass" minOccurs="1" maxOccurs="1" type="xs:boolean"/>
 					  <xs:element name="ClassOptions" minOccurs="1" maxOccurs="1">
 						  <xs:complexType>
-							  <xs:attribute name="PropertiesInsteadOfFields" form="qualified" type="xs:boolean" />
-							  <xs:attribute name="Order" form="qualified" type="xs:boolean" />
-							  <xs:attribute name="EnableDataBinding" form="qualified" type="xs:boolean" />
+							  <xs:sequence>
+								  <xs:element name="PropertiesInsteadOfFields" form="qualified" type="xs:boolean" />
+								  <xs:element name="Order" form="qualified" type="xs:boolean" />
+								  <xs:element name="EnableDataBinding" form="qualified" type="xs:boolean" />
+							  </xs:sequence>
 						  </xs:complexType>
 					  </xs:element>
-					  <xs:element name="DataSetOptions" minOccurs="0" maxOccurs="1">
+					  <xs:element name="DataSetOptions" minOccurs="1" maxOccurs="1">
 						  <xs:complexType>
-							  <xs:attribute name="EnableLinqDataSet" form="qualified" type="xs:boolean" />
+							<xs:sequence>
+							  <xs:element name="EnableLinqDataSet" form="qualified" type="xs:boolean" />
+							</xs:sequence>
 						  </xs:complexType>
 					  </xs:element>
 				  </xs:sequence>
 			  </xs:complexType>
 		  </xs:element>
-		  <xs:element name="ElementsToGenerateCodeFor" minOccurs="0" maxOccurs="1">
+		  <xs:element name="ElementsToGenerateCodeFor" minOccurs="1" maxOccurs="1">
 			  <xs:complexType>
 				  <xs:sequence>
 					  <xs:element name="Element" type="xs:string"  minOccurs="0" maxOccurs="unbounded"/>
