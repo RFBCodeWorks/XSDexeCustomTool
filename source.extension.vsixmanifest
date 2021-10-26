@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="XSDexe_CustomTool.ac45ca12-5166-4f1a-858c-177b38e27e23" Version="1.0" Language="en-US" Publisher="WittmannUser2@outlook.com" />
+        <DisplayName>XSDexe_CustomTool</DisplayName>
+        <Description xml:space="preserve">This custom tool is a wrapper class to run XSD.exe and generate a Class object instead of a DataTable object. 
+This was made because XSD files when imported to VS automatically generate DataSets, which can conflict with the classes XSD.exe exports if under the same namespace.
+So instead of outputting the dataset automatically and the class manually, this will simply generate the class file automatically.</Description>
+        <Icon>Resources\VSPackage1.ico</Icon>
+        <PreviewImage>Resources\VSPackage1.ico</PreviewImage>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version=" [14.0, 17.0)" />
+        <InstallationTarget Version=" [14.0, 17.0)" Id="Microsoft.VisualStudio.Pro" />
+        <InstallationTarget Version=" [14.0, 17.0)" Id="Microsoft.VisualStudio.Enterprise" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+        <Dependency Id="Microsoft.VisualStudio.MPF.16.0" DisplayName="Visual Studio MPF 16.0" d:Source="Installed" Version="[16.0,17.0)" />
+    </Dependencies>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version=" [14.0, 17.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    </Assets>
+</PackageManifest>

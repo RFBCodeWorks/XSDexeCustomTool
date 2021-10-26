@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+	This XSD.exe parameter file was automatically generated using XSDexeCustomTool Visual Studio Extension.
+	This file will be used when the extension runs XSD.exe as a way to pass parameters into the extension to determine how it writes the output class / dataset. 
+	Customize this file as needed for generating the Class / Dataset you desire. 
+	
+	See the comments below for what each parameter is used for.
+	
+	Note: The XSDexeCustomTool was designed for XSD files that are contained within a single file, 
+	so at this time specifying additional files using the <schema> tag is unsupported. Use at your own risk.
+	
+	For more info, see: https://docs.microsoft.com/en-us/dotnet/standard/serialization/xml-schema-definition-tool-xsd-exe
+-->
+
+<!-- Warning! : Do not use the 'output' or 'help' attributes within this node. They will cause the extension to error out by placing the file in an unexpected location. -->
+<!-- nologo: Suppresses the banner. -->
+<xsd xmlns='http://microsoft.com/dotnet/tools/xsd/' nologo='false'>
+	<!-- language:  CS (C#, the default), VB (Visual Basic), JS (JScript), or VJS (Visual J#). -->
+	<!-- namespace: Specifies the namespace for the generated code. The namespace must conform to CLR standards (for example, no spaces or backslash characters). -->
+	<!-- enableLinqDataSet: (true/false) Specifies that the generated DataSet can be queried against using LINQ to DataSet. The default value is false. -->
+	<generateDataSet language='VB' namespace='Microsoft.Serialization.Examples' enableLinqDataSet='false'/>
+</xsd>
