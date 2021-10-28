@@ -28,12 +28,12 @@ namespace XSDCustomToolVSIX
 
         #region < CustomTool Options >
 
-        [Category("CustomTool Options")]
-        [DisplayName("Generate Parameter File")]
-        [Description("Output a customizable parameter file that follows the requirements for XSD.exe. This will be used to customize the output of the custom tool that generates the classes." +
-            "If set to false, then the parameter file will not be used, and the options set within this page will be used instead. (If a parameter file already exists, it will be detected and used, but new ones will not be output.)")]
-        [DefaultValue(true)]
-        public bool GenerateParameterFiles{ get; set; } = true;
+        //[Category("CustomTool Options")]
+        //[DisplayName("Generate Parameter File")]
+        //[Description("Output a customizable parameter file that follows the requirements for XSD.exe. This will be used to customize the output of the custom tool that generates the classes." +
+        //    "If set to false, then the parameter file will not be used, and the options set within this page will be used instead. (If a parameter file already exists, it will be detected and used, but new ones will not be output.)")]
+        //[DefaultValue(true)]
+        //public bool GenerateParameterFiles{ get; set; } = true;
 
         [Category("Helper Class Options")]
         [DisplayName("Generate Helper Class")]
@@ -44,19 +44,19 @@ namespace XSDCustomToolVSIX
         [DefaultValue(true)]
         public bool GenerateHelperClass{ get; set; } = true;
 
-        [Category("Helper Class Options")]
-        [DisplayName("Regenerate Helper Class Automatically")]
-        [Description("The helper class file is meant to be a class that the end developer can customize to work with the classes output by XSD.exe. " +
-            "Setting this to TRUE will cause the file to be overwritten whenever the CustomTool is run (when the xsd file is updated)" +
-            "\nDefault Functionality (this set to false) will not perform any changes to the helper class file if it already exists on disk.")]
-        [DefaultValue(false)]
-        public bool OverWriteHelperClass { get; set; } = false;
+        //[Category("Helper Class Options")]
+        //[DisplayName("Regenerate Helper Class Automatically")]
+        //[Description("The helper class file is meant to be a class that the end developer can customize to work with the classes output by XSD.exe. " +
+        //    "Setting this to TRUE will cause the file to be overwritten whenever the CustomTool is run (when the xsd file is updated)" +
+        //    "\nDefault Functionality (this set to false) will not perform any changes to the helper class file if it already exists on disk.")]
+        //[DefaultValue(false)]
+        //public bool OverWriteHelperClass { get; set; } = false;
 
-        [Category("Helper Class Options")]
-        [DisplayName("Create Nested Classes")]
-        [Description("Experimental feature: When set true, this will loop through all discovered classes found in the XSD.exe output file and generate nested classes within the helper class. ")]
-        [DefaultValue(false)]
-        public bool GenerateNestedClasses { get; set; } = false;
+        //[Category("Helper Class Options")]
+        //[DisplayName("Create Nested Classes")]
+        //[Description("Experimental feature: When set true, this will loop through all discovered classes found in the XSD.exe output file and generate nested classes within the helper class. ")]
+        //[DefaultValue(false)]
+        //public bool GenerateNestedClasses { get; set; } = false;
 
         #endregion </ CustomTool Options >
 

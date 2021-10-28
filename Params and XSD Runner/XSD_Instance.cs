@@ -29,6 +29,7 @@ namespace XSDCustomToolVSIX
             this.XSDexeOptions = new XSDCustomTool_ParametersXSDexeOptions();
             this.XSDexeOptions.ClassOptions = new XSDCustomTool_ParametersXSDexeOptionsClassOptions();
             this.XSDexeOptions.DataSetOptions = new XSDCustomTool_ParametersXSDexeOptionsDataSetOptions();
+            this.HelperClassOptions = new XSDCustomTool_ParametersHelperClassOptions();
             //set defaults
             this.XSDexeOptions.Language = GetProjectLanguage();
             this.XSDexeOptions.NameSpace = defaultOptions.DefaultNameSpace;
@@ -38,6 +39,8 @@ namespace XSDCustomToolVSIX
             this.XSDexeOptions.ClassOptions.Order = defaultOptions.Order;
             this.XSDexeOptions.ClassOptions.PropertiesInsteadOfFields = !defaultOptions.GenerateFieldsInsteadOfProperties;
             this.XSDexeOptions.DataSetOptions.EnableLinqDataSet = defaultOptions.EnableLinqDataSet;
+            this.HelperClassOptions.GenerateHelperClass = defaultOptions.GenerateHelperClass;
+            this.HelperClassOptions.GenerateNestedClasses = false; // defaultOptions.GenerateNestedClasses;
         }
 
         /// <summary></summary>
@@ -63,6 +66,7 @@ namespace XSDCustomToolVSIX
             //Point to the new reference.
             this.XSDexeOptions = tmp.XSDexeOptions;
             this.ElementsToGenerateCodeFor = tmp.ElementsToGenerateCodeFor ?? new string[] { };
+            this.HelperClassOptions = tmp.HelperClassOptions;
             //Setup the other items
             this.XSDexeOptions.NameSpace = wszDefaultNamespace ?? tmp.XSDexeOptions.NameSpace;
             //Setup the Output Paths

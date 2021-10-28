@@ -6,36 +6,32 @@
 		  <xs:element name="XSDexeOptions" minOccurs="1" maxOccurs="1">
 			  <xs:complexType>
 				  <xs:sequence>
-					  <xs:element name="NameSpace" minOccurs="1" maxOccurs="1" type="xs:string"/>
-					  <xs:element name="Language" minOccurs="1" maxOccurs="1" >
-						  <xs:simpleType>
-							  <xs:restriction base = "xs:string">
-								  <xs:enumeration value = "CS"/>
-								  <xs:enumeration value = "VB"/>
-								  <xs:enumeration value = "JS"/>
-								  <xs:enumeration value = "VJS"/>
-							  </xs:restriction>
-						  </xs:simpleType>
-					  </xs:element>
-					  <xs:element name="NoLogo" minOccurs="1" maxOccurs="1" type="xs:boolean"/>
-					  <xs:element name="GenerateClass" minOccurs="1" maxOccurs="1" type="xs:boolean"/>
 					  <xs:element name="ClassOptions" minOccurs="1" maxOccurs="1">
 						  <xs:complexType>
-							  <xs:sequence>
-								  <xs:element name="PropertiesInsteadOfFields" form="qualified" type="xs:boolean" />
-								  <xs:element name="Order" form="qualified" type="xs:boolean" />
-								  <xs:element name="EnableDataBinding" form="qualified" type="xs:boolean" />
-							  </xs:sequence>
+							  <xs:attribute name="PropertiesInsteadOfFields" form="qualified" type="xs:boolean" />
+							  <xs:attribute name="Order" form="qualified" type="xs:boolean" />
+							  <xs:attribute name="EnableDataBinding" form="qualified" type="xs:boolean" />
 						  </xs:complexType>
 					  </xs:element>
 					  <xs:element name="DataSetOptions" minOccurs="1" maxOccurs="1">
 						  <xs:complexType>
-							<xs:sequence>
-							  <xs:element name="EnableLinqDataSet" form="qualified" type="xs:boolean" />
-							</xs:sequence>
+							  <xs:attribute name="EnableLinqDataSet" form="qualified" type="xs:boolean" />
 						  </xs:complexType>
 					  </xs:element>
 				  </xs:sequence>
+				  <xs:attribute name="NameSpace" type="xs:string"/>
+				  <xs:attribute name="Language" >
+					  <xs:simpleType>
+						  <xs:restriction base = "xs:string">
+							  <xs:enumeration value = "CS"/>
+							  <xs:enumeration value = "VB"/>
+							  <xs:enumeration value = "JS"/>
+							  <xs:enumeration value = "VJS"/>
+						  </xs:restriction>
+					  </xs:simpleType>
+				  </xs:attribute>
+				  <xs:attribute name="NoLogo" type="xs:boolean"/>
+				  <xs:attribute name="GenerateClass" type="xs:boolean"/>
 			  </xs:complexType>
 		  </xs:element>
 		  <xs:element name="ElementsToGenerateCodeFor" minOccurs="1" maxOccurs="1">
@@ -43,6 +39,12 @@
 				  <xs:sequence>
 					  <xs:element name="Element" type="xs:string"  minOccurs="0" maxOccurs="unbounded"/>
 				  </xs:sequence>
+			  </xs:complexType>
+		  </xs:element>
+		  <xs:element name="HelperClassOptions" minOccurs="1" maxOccurs="1">
+			  <xs:complexType>
+				<xs:attribute name="GenerateHelperClass" type="xs:string"/>
+				<xs:attribute name="GenerateNestedClasses" type="xs:string"/>
 			  </xs:complexType>
 		  </xs:element>
 	  </xs:sequence>
