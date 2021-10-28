@@ -66,16 +66,26 @@ namespace XSDCustomToolVSIX
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             
-            PhysicalFile solutionItem = await PhysicalFile.FromFileAsync(ParentItem.FullName);
-            //solutionItem.GetItemInfo(out IVsHierarchy heir, out uint itemId, out _);
-            //IVsProject proj = (IVsProject)heir;
-            //VSADDRESULT[] result = new VSADDRESULT[1];
-            //ErrorHandler.ThrowOnFailure(proj.AddItem(itemId, VSADDITEMOPERATION.VSADDITEMOP_LINKTOFILE, string.Empty, 1, new string[]{ ItemToAdd.FullName }, IntPtr.Zero, result));
-            //return;
-            Project project = await VS.Solutions.GetActiveProjectAsync();
-            await project.AddExistingFilesAsync(ItemToAdd.FullName);
-            PhysicalFile newItem = await PhysicalFile.FromFileAsync(ItemToAdd.FullName);
-            if (newItem != null) await solutionItem.AddNestedFileAsync(newItem);
+            //Project project = await VS.Solutions.GetActiveProjectAsync();
+            //System.Xml.XmlDocument projectXml = new System.Xml.XmlDocument();
+            //projectXml.Load(project.FullPath);
+            //string ProjectVer = projectXml.SelectSingleNode("//@ToolsVersion")?.Value;
+            //projectXml = null;
+
+            //if (Convert.ToSingle(ProjectVer) <= 15.0)
+            //{
+                EnvDTE.DTE dte = (EnvDTE.DTE)(Package.GetGlobalService(typeof(EnvDTE.DTE)));
+                var rootDocumentItem = dte.Solution.FindProjectItem(ParentItem.FullName);
+                rootDocumentItem.ProjectItems.AddFromFile(ItemToAdd.FullName);
+            //}
+            //else
+            //{
+            //    PhysicalFile solutionItem = await PhysicalFile.FromFileAsync(ParentItem.FullName);
+            //    //await project.AddExistingFilesAsync(ItemToAdd.FullName);
+            //    PhysicalFile newItem = await PhysicalFile.FromFileAsync(ItemToAdd.FullName);
+            //    if (newItem != null) await solutionItem.AddNestedFileAsync(newItem);
+            //}
+            
         }
 
         #endregion </ Add File to Project >
