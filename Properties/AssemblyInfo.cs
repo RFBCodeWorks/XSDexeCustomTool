@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("XSDCustomToolVSIX")]
-[assembly: AssemblyDescription("This custom tool is a wrapper class to run XSD.exe and generate a Class object instead of a DataTable object.")]
+[assembly: AssemblyDescription("This extension registers a new  Custom Tool for use with  XML Schema files -> XSDCustomTool <- This tool generates a class from the XSD file, then generates 2 additional files to assist with using the class that XSD.exe generated. This is  meant as an alternative to MSCustomDataSetGenerator, which uses XSD.exe's DataSet output.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("XSDCustomToolVSIX")]
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.2")]
-[assembly: AssemblyFileVersion("1.0.0.2")]
+[assembly: AssemblyVersion("1.0.0.3")]
+[assembly: AssemblyFileVersion("1.0.0.3")]

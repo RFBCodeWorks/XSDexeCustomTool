@@ -49,7 +49,7 @@ namespace XSDCustomToolVSIX
         {
             //Setup the File Paths
             InputFile = new FileInfo(wszInputFilePath); //Set the path and the ParamFile
-            ParamFile = new FileInfo(wszInputFilePath.Replace(".xsd", "_XsdParameters.xml"));
+            ParamFile = new FileInfo(wszInputFilePath.Replace(".xsd", XSDCustomTool.GetDefaultExtension()));
 
             XSDCustomTool_Parameters tmp;
             if (ParamFile.Exists)
@@ -166,17 +166,7 @@ namespace XSDCustomToolVSIX
         {
             try
             {
-                VSTools.WriteOutputPane("Saving Parameter File");
-                Directory.CreateDirectory(ParamFile.DirectoryName);
-                using (Stream stream = File.Open(ParamFile.FullName, FileMode.Create))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(XSDCustomTool_Parameters));
-                    XSDCustomTool_Parameters tmp = new XSDCustomTool_Parameters();
-                    tmp.ElementsToGenerateCodeFor = this.ElementsToGenerateCodeFor;
-                    tmp.XSDexeOptions = this.XSDexeOptions;
-                    serializer.Serialize(stream, tmp);
-                    stream.Flush();
-                }
+                SaveXMLToPath(ParamFile.FullName);
                 VSTools.AddFileToProject(InputFile, ParamFile);
             }
             catch (Exception E)
@@ -185,7 +175,31 @@ namespace XSDCustomToolVSIX
             }
         }
 
-        
+        /// <summary>
+        /// Save the Parameter File to Some Path
+        /// </summary>
+        /// <param name="Path">Fully Qualified path to save to</param>
+        public void SaveXMLToPath(string Path)
+        {
+            try
+            {
+                //VSTools.WriteOutputPane("Saving Parameter File");
+                Directory.CreateDirectory(ParamFile.DirectoryName);
+                using (Stream stream = File.Open(Path, FileMode.Create))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(XSDCustomTool_Parameters));
+                    XSDCustomTool_Parameters tmp = new XSDCustomTool_Parameters();
+                    tmp.ElementsToGenerateCodeFor = this.ElementsToGenerateCodeFor;
+                    tmp.XSDexeOptions = this.XSDexeOptions;
+                    serializer.Serialize(stream, tmp);
+                    stream.Flush();
+                }
+            }
+            catch (Exception E)
+            {
+                throw E;
+            }
+        }
 
     }
 }

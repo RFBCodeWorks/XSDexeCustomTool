@@ -57,9 +57,11 @@ namespace XSDCustomToolVSIX
 
         #endregion Write To Output Pane
 
+        public static string GetDefaultExtension() => "_Parameters.xml";
+        
         public int DefaultExtension(out string pbstrDefaultExtension)
         {
-            pbstrDefaultExtension = "_readme.xml";
+            pbstrDefaultExtension = GetDefaultExtension();
             return pbstrDefaultExtension != "" ? VSConstants.S_OK : VSConstants.S_FALSE;
         }
 
@@ -100,7 +102,8 @@ namespace XSDCustomToolVSIX
 
                 //Step 4: Save the parameters and add them to the project.
                 Write("Saving parameter file:", 5, false);
-                if (OutputGenerated) xsdParams.SaveXMLFile(); else throw new Exception("XSD.exe Failed during Execution!");
+                string tmpPath = Path.ChangeExtension(Path.GetTempFileName(), ".txt");
+                if (OutputGenerated) xsdParams.SaveXMLToPath(tmpPath); else throw new Exception("XSD.exe Failed during Execution!");
 
                 //Step 5: Make Corrections to the XSD.exe file output 
                 //MakeCorrectionsToXSDexeOutputFile(xsdParams);
@@ -108,29 +111,37 @@ namespace XSDCustomToolVSIX
                 //Step 6: Evaluate the output file and generate the helper class if it is missing
                 if (xsdParams.XSDexeOptions.Language == XSDCustomTool_ParametersXSDexeOptionsLanguage.CS) // Only run for C# currently, as the other languages are not set up!
                 {
+                    bool ClassFileRead = false;
                     IHelperClass HelperClassFile = GenerateHelperClass_Base.HelperClassFactory(xsdParams);
                     if (!HelperClassFile.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                     {
                         Write("Generating helper class:", 6, false);
-                        HelperClassFile.Generate(); 
+                        HelperClassFile.ReadInClassFile();
+                        ClassFileRead = true;
+                        HelperClassFile.Generate();
+                    }
+                    if (!HelperClassFile.SupplementFileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                    {
+                        Write("Generating Supplement File:", 7, false);
+                        if (!ClassFileRead) HelperClassFile.ReadInClassFile();
+                        HelperClassFile.GenerateSupplement();
                     }
                 }
 
-                Write("Writing Readme File:", 7, false);
-                // If the project name contains dashes replace with underscores since 
-                // namespaces do not permit dashes (underscores will be default to).
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                string resourceName = "Resources.XSDCustomTool_Readme.xml";
-                string InternalResourceName = $"XSDCustomToolVSIX.{resourceName}"; //{assembly.GetName().Name.Replace("-", "_")}
+                //Write("Writing Readme File:", 7, false);
+                //// If the project name contains dashes replace with underscores since 
+                //// namespaces do not permit dashes (underscores will be default to).
+                //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                //string resourceName = "Resources.XSDCustomTool_Readme.xml";
+                //string InternalResourceName = $"XSDCustomToolVSIX.{resourceName}"; //{assembly.GetName().Name.Replace("-", "_")}
 
                 // Pull the fully qualified resource name from the provided assembly
-                using (var resource = assembly.GetManifestResourceStream(InternalResourceName))
+                using (var resource = File.OpenRead(tmpPath)) //assembly.GetManifestResourceStream(InternalResourceName))
                 {
-                    if (resource == null)
-                        throw new FileNotFoundException($"Could not find [{resourceName}] in {assembly.FullName}!");
+                    //if (resource == null)
+                    //    throw new FileNotFoundException($"Could not find [{resourceName}] in {assembly.FullName}!");
 
                     //Copy the file into a buffer, then pass the buffer out as a result
-                    //C# int has a max of 2147483647, which is over 2GB. If you have a 2GB generated file class, you have other problems.
                     buffer = new byte[resource.Length];
                     resource.Read(buffer, 0, (int)resource.Length);
 
