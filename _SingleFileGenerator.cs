@@ -111,40 +111,25 @@ namespace XSDCustomToolVSIX
                 //Step 6: Evaluate the output file and generate the helper class if it is missing
                 if (xsdParams.XSDexeOptions.Language == XSDCustomTool_ParametersXSDexeOptionsLanguage.CS) // Only run for C# currently, as the other languages are not set up!
                 {
-                    bool ClassFileRead = false;
-                    IHelperClass HelperClassFile = GenerateHelperClass_Base.HelperClassFactory(xsdParams);
-                    if (!HelperClassFile.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                    ParsedFile FileGenerator = ParsedFile.ParsedFileFactory(xsdParams);
+                    if (!FileGenerator.HelperClass.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                     {
                         Write("Generating helper class:", 6, false);
-                        HelperClassFile.ReadInClassFile();
-                        ClassFileRead = true;
-                        HelperClassFile.Generate();
+                        FileGenerator.HelperClass.Generate();
                     }
-                    if (!HelperClassFile.SupplementFileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                    if (!FileGenerator.Supplement.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                     {
                         Write("Generating Supplement File:", 7, false);
-                        if (!ClassFileRead) HelperClassFile.ReadInClassFile();
-                        HelperClassFile.GenerateSupplement();
+                        FileGenerator.Supplement.Generate();
                     }
                 }
-
-                //Write("Writing Readme File:", 7, false);
-                //// If the project name contains dashes replace with underscores since 
-                //// namespaces do not permit dashes (underscores will be default to).
-                //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                //string resourceName = "Resources.XSDCustomTool_Readme.xml";
-                //string InternalResourceName = $"XSDCustomToolVSIX.{resourceName}"; //{assembly.GetName().Name.Replace("-", "_")}
 
                 // Pull the fully qualified resource name from the provided assembly
                 using (var resource = File.OpenRead(tmpPath)) //assembly.GetManifestResourceStream(InternalResourceName))
                 {
-                    //if (resource == null)
-                    //    throw new FileNotFoundException($"Could not find [{resourceName}] in {assembly.FullName}!");
-
                     //Copy the file into a buffer, then pass the buffer out as a result
                     buffer = new byte[resource.Length];
                     resource.Read(buffer, 0, (int)resource.Length);
-
                 }
 
                 //Specify the output vars
