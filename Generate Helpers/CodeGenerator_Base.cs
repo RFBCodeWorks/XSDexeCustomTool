@@ -4,34 +4,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 
 namespace XSDCustomToolVSIX.Generate_Helpers
 {
  
-    class CSCoder : Microsoft.CSharp.CSharpCodeProvider
-    {
-    }
-
+    /// <summary>
+    /// Abstract Base Class for all CodeGenerator classes. <br/>
+    /// Uses the <see cref="CodeDomProvider"/> selected by the <see cref="ParsedFile.LanguageProvider"/> to Save the the code to text. <br/>
+    /// This class  also provides the methods  shared across all generated files.
+    /// </summary>
     abstract class CodeGenerator_Base
     {
         private CodeGenerator_Base() { }
 
         protected CodeGenerator_Base(ParsedFile parsedFile) { this.ParsedFile = parsedFile; }
 
+        /// <summary> Reference to ParsedFile object that controls which Generators are firing. </summary>
         internal protected ParsedFile ParsedFile { get; }
 
+        /// <summary> This is the FileInfo object that houses the path when writing this file to disk. </summary>
         public abstract FileInfo FileOnDisk { get; }
 
-        //////////////////////////////////////////////////////////////////////////////
-        
-        #region < ShortCuts for XSD Parameters >
 
-        private  void test ()
-        {
-            System.CodeDom.CodeCompileUnit code = new CSCoder().Parse();
-            code.Namespaces[0].Types[0].Members[0].
-        }
-        
+        //////////////////////////////////////////////////////////////////////////////
+
+        #region < CodeDom >
+
+        protected virtual CodeDomProvider LanguageProvider => ParsedFile.LanguageProvider;
+
+        #endregion </ CodeDom >
+
+        //////////////////////////////////////////////////////////////////////////////
+
+        #region < ShortCuts for XSD Parameters >        
 
         /// <inheritdoc cref="XSDCustomTool_ParametersXSDexeOptions.NameSpace"/>
         protected string NameSpace => XSDInstance.XSDexeOptions.NameSpace;
@@ -46,23 +53,31 @@ namespace XSDCustomToolVSIX.Generate_Helpers
 
         #region < Shortcuts to the ParsedFile Properties >
 
-        /// <inheritdoc cref="ParsedFile.SummaryIndicator"/>
-        protected string SummaryIndicator => ParsedFile.SummaryIndicator;
-
-        /// <inheritdoc cref="ParsedFile.CommentIndicator"/>
-        protected string CommentIndicator => ParsedFile.CommentIndicator;
-
         /// <inheritdoc cref="ParsedFile.TopLevelClass"/>
         protected DiscoveredClass TopLevelClass => ParsedFile.TopLevelClass;
 
         /// <inheritdoc cref="ParsedFile.xSD_Instance"/>
         internal protected XSD_Instance XSDInstance => ParsedFile.xSD_Instance;
 
-        
+        /// <inheritdoc cref="ParsedFile.DiscoveredClasses"/>
+        protected DiscoveredClass[] DiscoveredClasses => ParsedFile.DiscoveredClasses;
 
         #endregion < Shortcuts to the ParsedFile Properties >
 
         //////////////////////////////////////////////////////////////////////////////
+
+        #region < Abstract Methods >
+
+        /// <summary>
+        /// Run this method to create a supplement file for the parial classes XSD.exe generated. <br/>
+        /// This method will end by calling <see cref="CodeGenerator_Base.Save(CodeCompileUnit);"/>
+        /// </summary>
+        public abstract void Generate();
+
+        /// <summary>Generates the comment header of the file that says the file was automatically generated and when it will be overwritten.</summary>
+        protected abstract CodeCommentStatementCollection GetComment_AutoGen();
+
+        #endregion </ Abstract Methods >
 
         #region < Methods >
 
@@ -72,46 +87,37 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         ///<inheritdoc cref="VSTools.TabIndent(int)"/>
         protected virtual string TabLevel(int i) => VSTools.TabIndent(i);
 
-        /// <summary>Disable the RegionWrap function. Will return the InputTxt value instead.</summary>
-        protected virtual bool DisableRegionWrap => false;
-        
+        /// <summary>Generate the StartRegion directive for the Constructors region </summary>
+        protected virtual CodeRegionDirective StartRegion_Constructor() => StartRegion("Constructors");
+        /// <summary>Generate the EndRegion directive for the Constructors region </summary>
+        protected virtual CodeRegionDirective EndRegion_Constructor() => EndRegion("Constructors");
+
         /// <summary> 
         /// Indicates the start of a region of code. <br/> 
-        /// Override if the language uses something other than #region <br/>
-        /// For example, JS will use //#region, so this will have to be overridden.
         /// </summary>
-        protected virtual string StartRegion => "#region";
-        
-        /// <summary> 
-        /// Indicates the end of a region of code. <br/> 
-        /// Override if the language uses something other than #endregion <br/>
-        /// For example, JS will use //#endregion, so this will have to be overridden.
-        /// </summary>
-        protected virtual string EndRegion => "#endregion";
-
-        /// <summary>
-        /// Wrap the InputTxt in a #region .... #endRegion block
-        /// </summary>
-        /// <param name="inputTxt">Text to wrap - This should have atleast one {Environment.NewLine} at the end of it. </param>
-        /// <param name="RegionName">This will be wrapped with carots as the Region Description </param>
-        /// <param name="BaseIndentLevel">Number of Indents to put onto the #region / #endregion lines.</param>
-        /// <returns></returns>
-        protected virtual string RegionWrap(string inputTxt, string RegionName, int IndentLevel)
+        protected virtual CodeRegionDirective StartRegion(string RegionHeader)
         {
-            if (DisableRegionWrap) return $"{NL}{inputTxt}{NL}";
-            string txt = $"{VSTools.TabIndent(IndentLevel)}{StartRegion} < {RegionName} >{NL}{NL}";
-            txt += inputTxt;
-            txt += $"{VSTools.TabIndent(IndentLevel)}{EndRegion} </ {RegionName} >{NL}{NL}";
-            return txt;
+            CodeRegionDirective region = new CodeRegionDirective();
+            region.RegionMode = CodeRegionMode.Start;
+            region.RegionText = $"< {RegionHeader} >";
+            return region;
         }
 
-        /// <summary>
-        /// Writes the file text to the FileOnDisk location, then adds it to the project.
+        /// <summary> 
+        /// Indicates the end of a region of code.
         /// </summary>
-        /// <param name="fileText"></param>
-        internal protected void Save(string fileText)
+        protected virtual CodeRegionDirective EndRegion(string RegionHeader)
         {
-            File.WriteAllText(this.FileOnDisk.FullName, fileText);
+            CodeRegionDirective region = new CodeRegionDirective();
+            region.RegionMode = CodeRegionMode.End;
+            region.RegionText = $"</ {RegionHeader} >";
+            return region;
+        }
+
+        protected void Save(CodeCompileUnit OutputUnit)
+        {
+            ICodeGenerator Generator = LanguageProvider.CreateGenerator(this.FileOnDisk.FullName);
+            Generator.GenerateCodeFromCompileUnit(OutputUnit, TextWriter.Null, new CodeGeneratorOptions { BlankLinesBetweenMembers = true });
             AddToProject(FileOnDisk);
         }
 
