@@ -13,26 +13,24 @@ namespace XSDCustomToolVSIX.Generate_Helpers
     /// </summary>
     internal class DiscoveredProperty
     {
-        internal DiscoveredProperty() { }
+        private DiscoveredProperty() { }
 
-        internal DiscoveredProperty(CodeMemberProperty ClassMember, CodeMemberField BackingField)
+        internal DiscoveredProperty(CodeMemberProperty ClassMember, CodeMemberField BackingField, DiscoveredClass @ParentClass)
         {
             BaseProperty = ClassMember;
             BaseField = BackingField;
+            ParentClassField = @ParentClass;
         }
 
         #region < Properties >
 
         
-        private CodeMemberProperty BaseProperty;
-        private CodeMemberField BaseField;
-
-        private DiscoveredClass ParentClassField;
-        private bool ReadOnlyField;
-        private bool IsSerializableField;
+        private readonly CodeMemberProperty BaseProperty;
+        private readonly CodeMemberField BaseField;
+        private readonly DiscoveredClass ParentClassField;
 
 
-        /// <summary>  </summary>
+        /// <summary></summary>
         /// <remarks><inheritdoc cref="CodeTypeMember.Attributes" path="*"/></remarks>
         internal MemberAttributes Attributes => BaseProperty?.Attributes ?? BaseField.Attributes;
 
@@ -43,7 +41,11 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         internal string Name => BaseProperty?.Name ?? BaseField?.Name ?? "UNKOWN";
 
         ///<inheritdoc cref="CodeTypeReference.BaseType"/>
-        internal string Type => BaseProperty?.Type?.BaseType ?? BaseField?.Type?.BaseType ?? "UNKOWN_TYPE";
+        internal string Type => CodeTypeReference.BaseType ?? "UNKOWN_TYPE";
+
+        private CodeTypeReference CodeTypeReference => BaseProperty?.Type ?? BaseField?.Type;
+
+        internal bool IsArrayType => CodeTypeReference?.ArrayRank >= 1;
 
         /// <inheritdoc cref="CodeMemberProperty.HasSet"/>
         internal bool HasSetter => BaseProperty?.HasSet ?? BaseField != null;
@@ -57,13 +59,18 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         internal protected DiscoveredClass ParentClass
         {
             get => ParentClassField;
-            set { if (!ReadOnlyField) ParentClassField = value; }
         }
 
         /// <summary> Flag for if the property is a serializable (Determined by attribute above the property) </summary>
-        internal bool IsSerializable { 
-            get => IsSerializableField;
-            set { if (!ReadOnlyField) IsSerializableField = value; }
+        internal bool IsSerializable {
+            get
+            {
+                if (!IsPublic) return false;
+                if (this.BaseProperty.CustomAttributes.Count == 0) return true;
+                foreach (CodeAttributeDeclaration attr in this.BaseProperty.CustomAttributes)
+                    if (attr.Name.Contains("XmlIgnoreAttribute")) return false;
+                return true;
+            }
         }
         
         #endregion < Properties >
@@ -90,28 +97,48 @@ namespace XSDCustomToolVSIX.Generate_Helpers
             
             CodeExpression left = new CodeVariableReferenceExpression(this.Name);
             CodeExpression right;
-            switch (this.Type.ToLower())
+            if (IsArrayType)
             {
-                case "string":
-                    right = new CodePrimitiveExpression(String.Empty);
-                    break;
-                case "int":
-                case "long":
-                    right = new CodePrimitiveExpression(0);
-                    break;
-                case "bool":
-                case "boolean":
-                    right = new CodePrimitiveExpression(false);
-                    break;
-                default:
-                    if (IsGeneratedType && IsGeneratedEnum)
-                        return null; // Not bothering  with this right now
-                    else if (IsGeneratedType && IsGeneratedClass)
-                        right = new CodeObjectCreateExpression(this.Type);
-                    //CodeArrayCreateExpression 
-                    else
-                        right = new CodePrimitiveExpression(null);
-                    break;
+                switch (this.Type.ToLower())
+                {
+                    case "string": right = new CodeArrayCreateExpression(typeof(string), 0); break;
+                    case "int": right = new CodeArrayCreateExpression(typeof(int), 0); break;
+                    case "long": right = new CodeArrayCreateExpression(typeof(long), 0); break;
+                    case "bool": right = new CodeArrayCreateExpression(typeof(bool), 0); break;
+                    case "double": right = new CodeArrayCreateExpression(typeof(double), 0); break;
+                    case "float":
+                    case "single": right = new CodeArrayCreateExpression(typeof(float), 0); break;
+                    default:
+                        if (IsGeneratedType)
+                            right = new CodeArrayCreateExpression(this.CodeTypeReference, 0);
+                        else
+                            right = new CodePrimitiveExpression(null);
+                        break;
+                }
+            }
+            else
+            {
+                switch (this.Type.ToLower())
+                {
+                    case "string": right = new CodePrimitiveExpression(String.Empty); break;
+                    case "bool": right = new CodePrimitiveExpression(false); break;
+                    case "float":
+                    case "single":
+                    case "double":
+                    case "int":
+                    case "long": right = new CodePrimitiveExpression(0); break;
+                    default:
+                        if (IsGeneratedType && IsGeneratedEnum)
+                        {
+                            DiscoveredEnum @enum = this.ParentClass.ParsedFile.FindEnumByName(this.Type);
+                            right = (@enum.GetDefaultAssignmentExpression);
+                        }
+                        else if (IsGeneratedType && IsGeneratedClass)
+                            right = new CodeObjectCreateExpression(this.Type);
+                        else
+                            right = new CodePrimitiveExpression(null);
+                        break;
+                }
             }
             return new CodeAssignStatement(left,right);
         }

@@ -87,10 +87,14 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         ///<inheritdoc cref="VSTools.TabIndent(int)"/>
         protected virtual string TabLevel(int i) => VSTools.TabIndent(i);
 
-        /// <summary>Generate the StartRegion directive for the Constructors region </summary>
-        protected virtual CodeRegionDirective StartRegion_Constructor() => StartRegion("Constructors");
-        /// <summary>Generate the EndRegion directive for the Constructors region </summary>
-        protected virtual CodeRegionDirective EndRegion_Constructor() => EndRegion("Constructors");
+        /// <summary>Generate the Region directives for the Constructors region </summary>
+        protected CodeRegionDirective Region_Constructor(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Constructors") : mode == CodeRegionMode.End ? EndRegion("Constructors") : null; 
+
+        /// <summary>Generate the Region directives for the Properties region </summary>
+        protected CodeRegionDirective Region_Properties(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Properties") : mode == CodeRegionMode.End ?  EndRegion("Properties") : null;
+
+        /// <summary>Generate the Region directives for the Methods region </summary>
+        protected CodeRegionDirective Region_Methods(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Methods") : mode == CodeRegionMode.End ? EndRegion("Methods") : null;
 
         /// <summary> 
         /// Indicates the start of a region of code. <br/> 
@@ -114,21 +118,46 @@ namespace XSDCustomToolVSIX.Generate_Helpers
             return region;
         }
 
+        /// <summary>
+        /// Process the CodeCompileUnit and save it to disk, then add it to the project.
+        /// </summary>
+        /// <param name="OutputUnit">Generate Code by looping through all NameSpaces. DOes not generate code at the CodeCompileUnit level to avoid the automatic comment.</param>
+        /// <param name="blankLinesBetweenMembers"><inheritdoc cref="CodeGeneratorOptions.BlankLinesBetweenMembers"/></param>
+        /// <param name="verbatimOrder"><inheritdoc cref="CodeGeneratorOptions.VerbatimOrder"/></param>
         protected void Save(CodeCompileUnit OutputUnit)
         {
+            if (FileOnDisk.Exists) FileOnDisk.Delete();
             ICodeGenerator Generator = LanguageProvider.CreateGenerator(this.FileOnDisk.FullName);
-            Generator.GenerateCodeFromCompileUnit(OutputUnit, TextWriter.Null, new CodeGeneratorOptions { BlankLinesBetweenMembers = true });
-            AddToProject(FileOnDisk);
+            using (IndentedTextWriter writer = new IndentedTextWriter(new StreamWriter(FileOnDisk.FullName)))
+            {
+                if (OutputUnit == null)
+                {
+                    Generator.GenerateCodeFromStatement(ParsedFile.ObjectProvider.UnableToParseComment, writer, SaveOptions);   
+                }
+                else
+                {
+                    foreach (CodeNamespace NS in OutputUnit.Namespaces)
+                        Generator.GenerateCodeFromNamespace(NS, writer, SaveOptions);
+                }
+                writer.Close();
+            }
+            if (FileOnDisk.Exists)
+                VSTools.AddFileToProject(XSDInstance.InputFile, FileOnDisk);
         }
 
         /// <summary>
-        /// Adds the file to the project.
+        /// Modify the Default <see cref="CodeGeneratorOptions"/> this file is saved with.
         /// </summary>
-        protected virtual void AddToProject(FileInfo file)
+        /// <remarks>
+        /// Base has the following settings: <br/>
+        /// BlankLinesBetweenMembers = true <br/>
+        /// VerbatimOrder = true<br/>
+        /// </remarks>
+        protected virtual CodeGeneratorOptions SaveOptions => new CodeGeneratorOptions()
         {
-            if (file.Exists)
-                VSTools.AddFileToProject(XSDInstance.InputFile, file);
-        }
+            BlankLinesBetweenMembers = true,
+            VerbatimOrder = true
+        };
 
         #endregion < Methods >
     }

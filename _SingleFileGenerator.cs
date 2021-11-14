@@ -27,13 +27,14 @@ namespace XSDCustomToolVSIX
     [Guid("83FBB942-657D-4C93-B99E-3F71D4410584")]
     [ComVisible(true)]
     [ProvideObject(typeof(XSDCustomTool))]
-    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", ProjectTypes.CSHARP, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", ProjectTypes.VB, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", ProjectTypes.NODE_JS, GeneratesDesignTimeSource = true)]
     public sealed class XSDCustomTool : IVsSingleFileGenerator
     {
         //Registers for the other languages
-        //[CodeGeneratorRegistration(typeof(XSDexeCustomTool), "XSDCustomTool", ProjectTypes.VB, GeneratesDesignTimeSource = true)]
+        // Unsure if the NodeJS is actually correct or not. But its that or J_Sharp, which I know my version of XSD.exe refuses to operate with.
         //[CodeGeneratorRegistration(typeof(XSDexeCustomTool), "XSDCustomTool", ProjectTypes.J_SHARP, GeneratesDesignTimeSource = true)]
-        //[CodeGeneratorRegistration(typeof(XSDexeCustomTool), "XSDCustomTool", ProjectTypes.NODE_JS, GeneratesDesignTimeSource = true)] //Don't know if this is actually correct
 
         private int MaxStepNumber = 5;
         private int CurrentStepNumber = 0;
@@ -110,12 +111,12 @@ namespace XSDCustomToolVSIX
 
                 //Step 6: Evaluate the output file and generate the helper class if it is missing
                 ParsedFile FileGenerator = ParsedFile.ParsedFileFactory(xsdParams);
-                if (!FileGenerator.HelperClass.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                if (false || !FileGenerator.HelperClass.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                 {
                     Write("Generating helper class:", 6, false);
                     FileGenerator.HelperClass.Generate();
                 }
-                if (!FileGenerator.Supplement.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                if (false || !FileGenerator.Supplement.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                 {
                     Write("Generating Supplement File:", 7, false);
                     FileGenerator.Supplement.Generate();

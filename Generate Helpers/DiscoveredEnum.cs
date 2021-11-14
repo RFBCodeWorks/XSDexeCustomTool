@@ -13,14 +13,18 @@ namespace XSDCustomToolVSIX.Generate_Helpers
     internal class DiscoveredEnum
     {
         private DiscoveredEnum() { }
-        internal DiscoveredEnum(CodeTypeDeclaration EnumDeclaration)
+        internal DiscoveredEnum(CodeTypeDeclaration EnumDeclaration, ParsedFile GeneratedFile)
         {
+            this.ParsedFile = GeneratedFile;
+            this.ParsedEnum = EnumDeclaration;
             foreach (CodeTypeMember member in EnumDeclaration.Members)
                 EnumValues.Add(new EnumValue(EnumDeclaration, member));
         }
 
         /// <inheritdoc cref="CodeTypeDeclaration" />
         protected CodeTypeDeclaration ParsedEnum { get; }
+
+        internal ParsedFile ParsedFile { get; }
 
         List<EnumValue> EnumValues { get; } = new List<EnumValue>();
 

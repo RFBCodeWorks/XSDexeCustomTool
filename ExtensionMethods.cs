@@ -41,7 +41,10 @@ namespace XSDCustomToolVSIX
 
         public static CodeTypeReferenceExpression GetCodeTypeReferenceExpression(this CodeTypeDeclaration dec) => new CodeTypeReferenceExpression(dec.Name);
 
-        internal static DiscoveredEnum FindEnumByType(this IEnumerable<DiscoveredEnum> enums, string EnumTypeName) => enums.Single((DiscoveredEnum e) => e.Type == EnumTypeName);
+        internal static DiscoveredEnum FindEnumByType(this IEnumerable<DiscoveredEnum> enums, string EnumTypeName) => enums.ToList().Find((DiscoveredEnum e) => e.Type == EnumTypeName);
+
+        /// <summary>Add a new CodeSnippetStatement to the Collection</summary>
+        public static void Add(this CodeStatementCollection coll, string str) => coll.Add(new CodeSnippetStatement(str));
 
         public static string ToLower_FirstCharOnly(this string s)
         {
@@ -50,5 +53,44 @@ namespace XSDCustomToolVSIX
             return String.Concat(r, r2);
         }
 
+        public static bool AnyContains(this IEnumerable<string> s, string[] SearchTerms, bool CaseSensitive = true)
+        {
+            foreach (string L in s)
+                if (CaseSensitive)
+                {
+                    foreach (string ST in SearchTerms)
+                        if (L.Contains(ST)) return true;
+                }
+                else
+                {
+                    foreach (string ST in SearchTerms)
+                        if (L.ToLower().Contains(ST.ToLower())) return true;
+                }
+            return false;
+        }
+
+        public static bool AnyContains(this IEnumerable<string> s, string SearchTerm, bool CaseSensitive = true)
+        {
+            foreach (string L in s)
+                if (
+                    (CaseSensitive && L.Contains(SearchTerm)) || 
+                    (!CaseSensitive && L.ToLower().Contains(SearchTerm.ToLower()))
+                    )
+                    return true;
+            return false;
+        }
+        
+        public static bool Any(this IEnumerable<string> s, string Searchterm) => s.Any((string l) => l == Searchterm);
+        public static bool Any(this IEnumerable<string> s, string Searchterm, bool CaseSensitive) 
+            => CaseSensitive ? s.Any(Searchterm) : s.Any((string l) => l.ToLower() == Searchterm.ToLower());
+
+        /// <summary>Check if any item in the arary is any of the following:<br/>
+        /// 'protected' <br/>
+        /// 'public' <br/>
+        /// 'internal' <br/>
+        /// 'private'</summary>
+        /// <returns></returns>
+        public static bool AnyProtectionLevel(this IEnumerable<string> s)
+            => s.Any("public", false) || s.Any("protected") || s.Any("internal") || s.Any("private", false);
     }
 }

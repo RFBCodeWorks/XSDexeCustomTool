@@ -47,7 +47,7 @@ public partial class XSDCustomTool_Parameters {
             $"{System.Environment.NewLine}" +
             $"\tFor more info, see: https://docs.microsoft.com/en-us/dotnet/standard/serialization/xml-schema-definition-tool-xsd-exe {System.Environment.NewLine}",
             $"{System.Environment.NewLine}" +
-            $"\tPlease report any issues here.Help is needed to implement functionality for JS, VB, and J# languages (which are all already supported by XSD.exe).{System.Environment.NewLine}",
+            $"\tPlease report any issues here.Help is needed to implement functionality for JS, and VB languages (which are all already supported by XSD.exe).{System.Environment.NewLine}",
             $"\thttps://github.com/RFBomb/XSDexeCustomTool",
             $"{System.Environment.NewLine}{System.Environment.NewLine}",
             $"\tCustomize this file to modify how XSDCustomTool processes the associated .XSD file{System.Environment.NewLine}\t"

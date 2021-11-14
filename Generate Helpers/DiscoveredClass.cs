@@ -11,24 +11,32 @@ namespace XSDCustomToolVSIX.Generate_Helpers
     /// <summary> This represents a class that was discovered when evaluting the output file from XSD.exe </summary>
     internal class DiscoveredClass
     {
+        
+        #region </ Construction >
+
         private DiscoveredClass() { }
 
-        public DiscoveredClass(CodeTypeDeclaration ClassDeclaration)
+        public DiscoveredClass(CodeTypeDeclaration ClassDeclaration, ParsedFile GeneratedFile)
         {
             this.ParsedClass = ClassDeclaration;
+            this.ParsedFile = GeneratedFile;
+
             List<CodeMemberField> Fields = ParsedClass.Members.OfType<CodeMemberField>().ToList();
             bool HasProperties = ParsedClass.Members.OfType<CodeMemberProperty>().Count() > 0;
             foreach (CodeTypeMember member in ParsedClass.Members)
             {
                 switch (true)
                 {
+                    case true when member.Attributes == MemberAttributes.Private: break; //Ignore
+
                     case true when member.GetType() == typeof(CodeMemberProperty):
                         //Add the Property to the ClassProperty list
-                        ClassProperties.Add(new DiscoveredProperty((CodeMemberProperty)member,null));
+                        CodeMemberProperty prop = (CodeMemberProperty)member;
+                        ClassProperties.Add(ParsedFile.ObjectProvider.DiscoveredPropertyGenerator(prop, TryGetBackingField(prop), this));
                         break;
                     case true when !HasProperties && member.GetType() == typeof(CodeMemberField):
                         //Add the Field to the ClassProperty list, since it should be a public field
-                        ClassProperties.Add(new DiscoveredProperty(null, (CodeMemberField)member));
+                        ClassProperties.Add(ParsedFile.ObjectProvider.DiscoveredPropertyGenerator(null, (CodeMemberField)member, this));
                         break;
                     case true when member.GetType() == typeof(CodeMemberMethod):
                         //Currently Ignored
@@ -42,15 +50,30 @@ namespace XSDCustomToolVSIX.Generate_Helpers
             }
         }
 
-        /// <inheritdoc cref="CodeTypeDeclaration" />
-        internal protected CodeTypeDeclaration ParsedClass { get; }
+        /// <summary>
+        /// Check the CodeMemberProperty 
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <returns></returns>
+        private CodeMemberField TryGetBackingField(CodeMemberProperty prop)
+        {
+            foreach (CodeMemberField fld in this.ParsedClass.Members.OfType<CodeMemberField>())
+            {
+                if (fld.Name.ToLower() == prop.Name.ToLower()+"field")
+                    return fld;
+            }
+            return null;
+        }
+
+        #endregion </ Construction >
 
         #region < Properties >
 
-        internal bool IsTopLevelNode { get; }
-
         /// <summary>Reference to the ParseFile object this DiscoveredClass was generated from</summary>
         internal ParsedFile ParsedFile { get; }
+
+        /// <inheritdoc cref="CodeTypeDeclaration" />
+        internal protected CodeTypeDeclaration ParsedClass { get; }
 
         /// <summary> This is the name of the class (the 'type' of the class.)</summary>
         public string ClassName => ParsedClass.Name;
@@ -64,40 +87,41 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         private bool HasInstanceConstructor => ParsedClass.Members.OfType<CodeConstructor>().Count() > 0;
         private bool HasStaticConstructor => ParsedClass.Members.OfType<CodeTypeConstructor>().Count() > 0;
 
-        #endregion </ Properties >
-
         /// <summary> This is the name of the property within the Helper class. </summary>
         /// <returns>Base property returns the <see cref="DiscoveredClass.ClassName"/></returns>
         public virtual string HelperClass_PropertyName => this.ClassName;
 
+        #endregion </ Properties >
+
         #region < CodeDom >
 
         /// <summary>Returns new CodeTypeReference object for this class</summary>
-        /// <returns></returns>
-        public CodeTypeReference GetCodeTypeReference() => new CodeTypeReference(this.ClassName);
+        /// <returns>new CodeTypeReference(this.ClassName)</returns>
+        internal virtual CodeTypeReference GetCodeTypeReference() => new CodeTypeReference(this.ClassName);
 
-        /// <summary>Get the object that represents this class as a property of within the HelperClass</summary>
-        /// <param name="IsPublic">set TRUE to return a Public Property, set FALSE to return a Private property</param>
-        /// <returns>for C#: "{Public/Private} {ClassName} {PropertyName} {get;set;}"</returns>
-        internal CodeMemberProperty GetHelperClassProperty(bool IsPublic = true)
-        {
-            CodeMemberProperty tmp = new CodeMemberProperty();
-            tmp.Attributes = IsPublic ? MemberAttributes.Public : MemberAttributes.Private;
-            tmp.Comments.Add("<summary>  </summary>");
-            tmp.HasGet = true;
-            tmp.HasSet = true;
-            tmp.Type = GetCodeTypeReference();
-            tmp.Name = this.HelperClass_PropertyName;
-            return tmp;
-        }
+        /// <summary>Returns a CodeMemberProperty Object for the HelperClass Property <br/>
+        /// Overrides may return a CodeSnippet instead. </summary>
+        internal virtual CodeTypeMemberCollection GetHelperClassProperty(bool isPublic = true)
+            => ParsedFile.ObjectProvider.CreateNew_CodeMemberProperty(
+                name: this.HelperClass_PropertyName,
+                type: GetCodeTypeReference(),
+                attributes: MemberAttributes.Public,
+                comments: new CodeCommentStatementCollection { GetHelperClassPropertySummary() },
+                hasSet: true
+                );
+
+
+        /// <summary>
+        /// This is the text to wrap within the &lt;summary&gt; brackets
+        /// </summary>
+        protected virtual string GetHelperClassPropertySummaryText() => $"This Property Represents the <see cref=\"{ClassName}\"/> XML Object Class";
+
+        /// <summary>
+        /// Wrap the result of <see cref="GetHelperClassPropertySummaryText"/> in &lt;summary&gt; brackets and return as a new <see cref="CodeCommentStatement"/>
+        /// </summary>
+        protected CodeCommentStatement GetHelperClassPropertySummary() => new CodeCommentStatement($"<summary>{GetHelperClassPropertySummaryText()}</summary>",true);
 
         #endregion </ CodeDom >
-
-        /// <summary>Get the string that for the parameterless constructor that initializes all properties. <br/>
-        /// This will be used when building the Supplement File if [<c><see cref="DiscoveredClass.ContainsParameterLessConstructor"/></c>] is false</summary>
-        /// <param name="BaseIndentLevel"></param>
-        /// <returns> Class() {} </returns>
-        //internal abstract string GetConstructor(int BaseIndentLevel);
 
         
     }
