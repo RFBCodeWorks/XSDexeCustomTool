@@ -23,18 +23,23 @@ namespace XSDCustomToolVSIX
     /// </summary>
     /// <remarks>https://docs.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.shell.interop.ivssinglefilegenerator?view=visualstudiosdk-2019</remarks>
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("XSDCustomTool", "XSD class generator for use as alternative for MSDataSetGenerator", "1.0")]
+    [InstalledProductRegistration("XSDCustomTool", "XSD class generator for use as alternative for MSDataSetGenerator", "1.62")]
     [Guid("83FBB942-657D-4C93-B99E-3F71D4410584")]
     [ComVisible(true)]
     [ProvideObject(typeof(XSDCustomTool))]
-    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", ProjectTypes.CSHARP, GeneratesDesignTimeSource = true)]
-    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", ProjectTypes.VB, GeneratesDesignTimeSource = true)]
-    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", ProjectTypes.NODE_JS, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", "{164B10B9-B200-11D0-8C61-00A0C91E29D5}", GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(XSDCustomTool), "XSDCustomTool", "{E6FDF8B0-F3D1-11D4-8576-0002A516ECE8}", GeneratesDesignTimeSource = true)]
     public sealed class XSDCustomTool : IVsSingleFileGenerator
     {
-        //Registers for the other languages
-        // Unsure if the NodeJS is actually correct or not. But its that or J_Sharp, which I know my version of XSD.exe refuses to operate with.
-        //[CodeGeneratorRegistration(typeof(XSDexeCustomTool), "XSDCustomTool", ProjectTypes.J_SHARP, GeneratesDesignTimeSource = true)]
+
+        //Currently registered for (in order): C#, VB, J#
+
+        //Important Note: Do not update the Microsoft.VisualStudio.SDK NuGet package off the current version, as it will somehow break the Registration process, making VS say "XSDCustomTool Cannot Be Found"
+        //Known Working Version as of 11-15-2021: Microsoft.VisualStudio.SDK v 16.9.31025.194
+
+        //Important Note: Community.VisualStudio.Toolkit NuGet package requires a Version 16.x.x..x
+        //16.x.x.x is targeting Framework 4.7.2, while 17.x.x.x is targeting 4.8 and newer. Only use packages labeled with 16.x.x.x
 
         private int MaxStepNumber = 5;
         private int CurrentStepNumber = 0;

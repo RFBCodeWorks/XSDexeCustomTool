@@ -44,6 +44,10 @@ namespace XSDCustomToolVSIX
                     output = new ParsedFile_JS(xSD);
                     output.ObjectProvider = new ObjectProvider_JS();
                     break;
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VJS:
+                    output = new ParsedFile_JSharp(xSD);
+                    output.ObjectProvider = new ObjectProvider_JSharp();
+                    break;
                 default:
                     output = new ParsedFile(xSD);
                     output.ObjectProvider = new ObjectProvider();

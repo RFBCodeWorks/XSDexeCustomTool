@@ -69,6 +69,7 @@
     <Compile Include="Generate Helpers\DiscoveredProperty.cs" />
     <Compile Include="Generate Helpers\CodeGenerator_HelperClass.cs" />
     <Compile Include="Generate Helpers\CodeGenerator_Base.cs" />
+    <Compile Include="Generate Helpers\Overrides_JSharp.cs" />
     <Compile Include="Generate Helpers\Overrides_JS.cs" />
     <Compile Include="Generate Helpers\Overrides_VB.cs" />
     <Compile Include="Generate Helpers\ParsedFile.cs" />
@@ -128,7 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Community.VisualStudio.Toolkit">
-      <Version>16.0.76.303</Version>
+      <Version>16.0.76.309</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK">
       <Version>16.9.31025.194</Version>
