@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="XSDCustomToolVSIX.ac45ca12-5166-4f1a-858c-177b38e27e23" Version="1.62" Language="en-US" Publisher="RBrenckman" />
+        <Identity Id="XSDCustomToolVSIX.ac45ca12-5166-4f1a-858c-177b38e27e23" Version="1.63" Language="en-US" Publisher="RBrenckman" />
         <DisplayName>XSDCustomTool</DisplayName>
         <Description xml:space="preserve">This custom tool is a wrapper class to run XSD.exe and generate a Class object instead of a DataTable object. 
 This was made because XSD files when imported to VS automatically generate DataSets, which can conflict with the classes XSD.exe exports if under the same namespace.

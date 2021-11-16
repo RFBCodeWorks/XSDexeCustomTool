@@ -23,7 +23,7 @@ namespace XSDCustomToolVSIX
     /// </summary>
     /// <remarks>https://docs.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.shell.interop.ivssinglefilegenerator?view=visualstudiosdk-2019</remarks>
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("XSDCustomTool", "XSD class generator for use as alternative for MSDataSetGenerator", "1.62")]
+    [InstalledProductRegistration("XSDCustomTool", "XSD class generator for use as alternative for MSDataSetGenerator", "1.63")]
     [Guid("83FBB942-657D-4C93-B99E-3F71D4410584")]
     [ComVisible(true)]
     [ProvideObject(typeof(XSDCustomTool))]

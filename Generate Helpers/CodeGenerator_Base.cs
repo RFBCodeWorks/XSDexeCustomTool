@@ -122,27 +122,38 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         /// Process the CodeCompileUnit and save it to disk, then add it to the project.
         /// </summary>
         /// <param name="OutputUnit">Generate Code by looping through all NameSpaces. DOes not generate code at the CodeCompileUnit level to avoid the automatic comment.</param>
-        /// <param name="blankLinesBetweenMembers"><inheritdoc cref="CodeGeneratorOptions.BlankLinesBetweenMembers"/></param>
-        /// <param name="verbatimOrder"><inheritdoc cref="CodeGeneratorOptions.VerbatimOrder"/></param>
-        protected void Save(CodeCompileUnit OutputUnit)
+        /// <param name="AddAsSubFile">Set TRUE to add as a file below the XSD file (where a SingleFileGenerator would typically put files.)<br/> Set FALSE to add to the project itself so it appears on same level as the xsd file in the solution explorer tree.</param>
+        protected void Save(CodeCompileUnit OutputUnit, bool AddAsSubFile)
         {
-            if (FileOnDisk.Exists) FileOnDisk.Delete();
-            ICodeGenerator Generator = LanguageProvider.CreateGenerator(this.FileOnDisk.FullName);
-            using (IndentedTextWriter writer = new IndentedTextWriter(new StreamWriter(FileOnDisk.FullName)))
+            //Delete the file if it exists
+            if (File.Exists(FileOnDisk.FullName)) FileOnDisk.Delete();
+            
+            // Only create the file if its missing
+            if (!File.Exists(FileOnDisk.FullName))
             {
-                if (OutputUnit == null)
+                ICodeGenerator Generator = LanguageProvider.CreateGenerator(this.FileOnDisk.FullName);
+                using (IndentedTextWriter writer = new IndentedTextWriter(new StreamWriter(FileOnDisk.FullName)))
                 {
-                    Generator.GenerateCodeFromStatement(ParsedFile.ObjectProvider.UnableToParseComment, writer, SaveOptions);   
+                    if (OutputUnit == null)
+                    {
+                        Generator.GenerateCodeFromStatement(ParsedFile.ObjectProvider.UnableToParseComment, writer, SaveOptions);
+                    }
+                    else
+                    {
+                        foreach (CodeNamespace NS in OutputUnit.Namespaces)
+                            Generator.GenerateCodeFromNamespace(NS, writer, SaveOptions);
+                    }
+                    writer.Close();
                 }
-                else
-                {
-                    foreach (CodeNamespace NS in OutputUnit.Namespaces)
-                        Generator.GenerateCodeFromNamespace(NS, writer, SaveOptions);
-                }
-                writer.Close();
             }
             if (FileOnDisk.Exists)
-                VSTools.AddFileToProject(XSDInstance.InputFile, FileOnDisk);
+            {
+                if (AddAsSubFile)
+                    VSTools.AddFileToProject(XSDInstance.InputFile, FileOnDisk);
+                else
+                    VSTools.AddFileToProject(FileOnDisk);
+            }
+
         }
 
         /// <summary>
@@ -161,4 +172,5 @@ namespace XSDCustomToolVSIX.Generate_Helpers
 
         #endregion < Methods >
     }
+
 }
