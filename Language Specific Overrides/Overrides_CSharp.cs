@@ -497,6 +497,4 @@ namespace XSDCustomToolVSIX.Generate_Helpers
 
     }
 
-    
-
 }

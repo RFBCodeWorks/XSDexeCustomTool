@@ -15,7 +15,7 @@ namespace XSDCustomToolVSIX.Generate_Helpers
     /// Uses the <see cref="CodeDomProvider"/> selected by the <see cref="ParsedFile.LanguageProvider"/> to Save the the code to text. <br/>
     /// This class  also provides the methods  shared across all generated files.
     /// </summary>
-    abstract class CodeGenerator_Base
+    internal abstract class CodeGenerator_Base
     {
         private CodeGenerator_Base() { }
 
