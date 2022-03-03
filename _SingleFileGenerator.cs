@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using Community.VisualStudio.Toolkit;
-
+using XSDCustomToolVSIX.Interfaces;
 
 /// <summary>
 /// 
@@ -115,7 +115,7 @@ namespace XSDCustomToolVSIX
                 //MakeCorrectionsToXSDexeOutputFile(xsdParams);
 
                 //Step 6: Evaluate the output file and generate the helper class if it is missing
-                ParsedFile FileGenerator = ParsedFile.ParsedFileFactory(xsdParams);
+                IParsedFile FileGenerator = ParsedFile.ParsedFileFactory(xsdParams);
                 if (false || !FileGenerator.HelperClass.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                 {
                     Write("Generating helper class:", 6, false);
