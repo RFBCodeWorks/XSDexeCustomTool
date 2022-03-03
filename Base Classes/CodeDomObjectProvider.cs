@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.CodeDom;
+using XSDCustomToolVSIX.Interfaces;
+using XSDCustomToolVSIX.Language_Specific_Overrides;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.BaseClasses
 {
     /// <summary>
     /// Contains overrideable methods for creating various objects.  <br/>
@@ -14,6 +16,27 @@ namespace XSDCustomToolVSIX.Generate_Helpers
     /// </summary>
     internal class CodeDomObjectProvider : ICodeDomObjectProvider
     {
+
+        #region < Class Factory >
+
+        private static CodeDomObjectProvider_CSharp CSharpProvider = new CodeDomObjectProvider_CSharp();
+        private static CodeDomObjectProvider_VB VBProvider = new CodeDomObjectProvider_VB();
+        private static CodeDomObjectProvider_JS JSProvider = new CodeDomObjectProvider_JS();
+        private static CodeDomObjectProvider_JSharp JSharpProvider = new CodeDomObjectProvider_JSharp();
+
+        internal static ICodeDomObjectProvider GetObjectProvider(XSDCustomTool_ParametersXSDexeOptionsLanguage lang)
+        {
+            switch (lang)
+            {
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.CS: return CSharpProvider;
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VB: return VBProvider;
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.JS: return JSProvider;
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VJS: return JSharpProvider;
+                default: throw new NotImplementedException();
+            }
+        }
+
+        #endregion
 
         /// <summary>Override this method to create a derived CodeGenerator_HelperClass instead of the base CodeGenerator_HelperClass </summary>
         public virtual CodeGenerator_HelperClass HelperClassGenerator(ParsedFile parsedfile) => new CodeGenerator_HelperClass(parsedfile);

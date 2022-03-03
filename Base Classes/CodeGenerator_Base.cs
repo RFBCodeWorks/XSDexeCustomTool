@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using XSDCustomToolVSIX.Interfaces;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.BaseClasses
 {
 
     /// <summary>

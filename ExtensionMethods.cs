@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.CodeDom;
-using XSDCustomToolVSIX.Generate_Helpers;
+using XSDCustomToolVSIX.BaseClasses;
 
 namespace XSDCustomToolVSIX
 {

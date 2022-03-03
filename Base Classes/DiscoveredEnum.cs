@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.CodeDom;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.BaseClasses
 {
     /// <summary>
     /// Wrapperfor CodeTypeDeclaration where IsEnum is TRUE

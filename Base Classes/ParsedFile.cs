@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using XSDCustomToolVSIX.Generate_Helpers;
+using XSDCustomToolVSIX.BaseClasses;
+using XSDCustomToolVSIX.Language_Specific_Overrides;
 using System.CodeDom;
 
 namespace XSDCustomToolVSIX
@@ -87,7 +88,7 @@ namespace XSDCustomToolVSIX
         private readonly Lazy<DiscoveredClass> TopLevelClassAssumption; //Assume that first class found is top level class
         private DiscoveredClass TopLevelClassField = null;
         
-        /// <inheritdoc cref="XSDCustomToolVSIX.Generate_Helpers.CodeDomObjectProvider"/>
+        /// <inheritdoc cref="XSDCustomToolVSIX.BaseClasses.CodeDomObjectProvider"/>
         internal CodeDomObjectProvider CodeDomObjectProvider { get; private set; }
 
 

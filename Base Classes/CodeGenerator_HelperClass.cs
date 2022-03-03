@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.BaseClasses
 {
     internal class CodeGenerator_HelperClass : CodeGenerator_Base
     {

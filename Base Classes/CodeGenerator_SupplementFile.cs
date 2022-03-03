@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.CodeDom;
 
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.BaseClasses
 {
     /// <summary>
     /// The Supplement File is meant to fill in the gaps that XSD.exe left out. 

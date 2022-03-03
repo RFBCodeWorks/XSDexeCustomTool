@@ -72,6 +72,7 @@
     <Compile Include="Base Classes\CodeGenerator_Base.cs" />
     <Compile Include="Interfaces\ILinqClassGenerator.cs" />
     <Compile Include="Interfaces\IClassGenerator.cs" />
+    <Compile Include="Language Specific Overrides\LinqOverrides_CSharp.cs" />
     <Compile Include="Language Specific Overrides\Overrides_JSharp.cs" />
     <Compile Include="Language Specific Overrides\Overrides_JS.cs" />
     <Compile Include="Language Specific Overrides\Overrides_VB.cs" />

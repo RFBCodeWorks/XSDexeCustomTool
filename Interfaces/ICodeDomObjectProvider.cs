@@ -1,6 +1,6 @@
 ﻿using System.CodeDom;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.Interfaces
 {
     /// <summary>
     /// Interface for the Language-specific CodeDomObjectProvider methods

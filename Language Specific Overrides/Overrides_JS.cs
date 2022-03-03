@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XSDCustomToolVSIX.BaseClasses;
+using XSDCustomToolVSIX.Interfaces;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.Language_Specific_Overrides
 {
     internal class CodeDomObjectProvider_JS : CodeDomObjectProvider
     {

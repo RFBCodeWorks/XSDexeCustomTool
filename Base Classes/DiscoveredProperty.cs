@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.BaseClasses
 {
     /// <summary>
     /// Represents the discovered Property of a class

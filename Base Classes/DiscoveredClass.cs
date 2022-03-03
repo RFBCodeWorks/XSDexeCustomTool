@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 
-namespace XSDCustomToolVSIX.Generate_Helpers
+namespace XSDCustomToolVSIX.BaseClasses
 {
     /// <summary> This represents a class that was discovered when evaluting the output class file from XSD.exe </summary>
     internal class DiscoveredClass
