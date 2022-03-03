@@ -34,28 +34,28 @@ namespace XSDCustomToolVSIX
             {
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.CS:
                     output = new ParsedFile_CSharp(xSD);
-                    output.ObjectProvider = new ObjectProvider_CSharp();
+                    output.CodeDomObjectProvider = new CodeDomObjectProvider_CSharp();
                     break;
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.VB:
                     output = new ParsedFile_VB(xSD);
-                    output.ObjectProvider = new ObjectProvider_VB();
+                    output.CodeDomObjectProvider = new CodeDomObjectProvider_VB();
                     break;
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.JS:
                     output = new ParsedFile_JS(xSD);
-                    output.ObjectProvider = new ObjectProvider_JS();
+                    output.CodeDomObjectProvider = new CodeDomObjectProvider_JS();
                     break;
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.VJS:
                     output = new ParsedFile_JSharp(xSD);
-                    output.ObjectProvider = new ObjectProvider_JSharp();
+                    output.CodeDomObjectProvider = new CodeDomObjectProvider_JSharp();
                     break;
                 default:
                     output = new ParsedFile(xSD);
-                    output.ObjectProvider = new ObjectProvider();
+                    output.CodeDomObjectProvider = new CodeDomObjectProvider();
                     break;
             }
             output.LanguageProvider = output.GetCodeDomProvider();
-            output.HelperClass = output.ObjectProvider.HelperClassGenerator(output);
-            output.Supplement = output.ObjectProvider.SupplementFileGenerator(output);
+            output.HelperClass = output.CodeDomObjectProvider.HelperClassGenerator(output);
+            output.Supplement = output.CodeDomObjectProvider.SupplementFileGenerator(output);
             return output;
 
 
@@ -87,8 +87,8 @@ namespace XSDCustomToolVSIX
         private readonly Lazy<DiscoveredClass> TopLevelClassAssumption; //Assume that first class found is top level class
         private DiscoveredClass TopLevelClassField = null;
         
-        /// <inheritdoc cref="XSDCustomToolVSIX.Generate_Helpers.ObjectProvider"/>
-        internal ObjectProvider ObjectProvider { get; private set; }
+        /// <inheritdoc cref="XSDCustomToolVSIX.Generate_Helpers.CodeDomObjectProvider"/>
+        internal CodeDomObjectProvider CodeDomObjectProvider { get; private set; }
 
 
         #region < CodeDom - Lanugage Parse & Provider >
@@ -218,7 +218,7 @@ namespace XSDCustomToolVSIX
             List<DiscoveredClass> list = new List<DiscoveredClass>();
             foreach (CodeTypeDeclaration type in TargetNameSpace.Types.Where( (CodeTypeDeclaration d)=> d.IsClass))
             {
-                list.Add(ObjectProvider.DiscoveredClassGenerator(type, this));
+                list.Add(CodeDomObjectProvider.DiscoveredClassGenerator(type, this));
             }
             return list.ToArray();
         }
@@ -232,7 +232,7 @@ namespace XSDCustomToolVSIX
             List<DiscoveredEnum> list = new List<DiscoveredEnum>();
             foreach (CodeTypeDeclaration type in TargetNameSpace.Types.Where((CodeTypeDeclaration d) => d.IsEnum))
             {
-                list.Add(ObjectProvider.DiscoveredEnumGenerator(type, this));
+                list.Add(CodeDomObjectProvider.DiscoveredEnumGenerator(type, this));
             }
             return list.ToArray();
         }

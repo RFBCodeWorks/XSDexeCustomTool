@@ -9,13 +9,13 @@ using System.CodeDom.Compiler;
 
 namespace XSDCustomToolVSIX.Generate_Helpers
 {
- 
+
     /// <summary>
     /// Abstract Base Class for all CodeGenerator classes. <br/>
     /// Uses the <see cref="CodeDomProvider"/> selected by the <see cref="ParsedFile.LanguageProvider"/> to Save the the code to text. <br/>
-    /// This class  also provides the methods  shared across all generated files.
+    /// This class  also provides the methods shared across all generated files.
     /// </summary>
-    internal abstract class CodeGenerator_Base
+    internal abstract class CodeGenerator_Base : IClassGenerator
     {
         private CodeGenerator_Base() { }
 
@@ -88,10 +88,10 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         protected virtual string TabLevel(int i) => VSTools.TabIndent(i);
 
         /// <summary>Generate the Region directives for the Constructors region </summary>
-        protected CodeRegionDirective Region_Constructor(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Constructors") : mode == CodeRegionMode.End ? EndRegion("Constructors") : null; 
+        protected CodeRegionDirective Region_Constructor(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Constructors") : mode == CodeRegionMode.End ? EndRegion("Constructors") : null;
 
         /// <summary>Generate the Region directives for the Properties region </summary>
-        protected CodeRegionDirective Region_Properties(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Properties") : mode == CodeRegionMode.End ?  EndRegion("Properties") : null;
+        protected CodeRegionDirective Region_Properties(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Properties") : mode == CodeRegionMode.End ? EndRegion("Properties") : null;
 
         /// <summary>Generate the Region directives for the Methods region </summary>
         protected CodeRegionDirective Region_Methods(CodeRegionMode mode) => mode == CodeRegionMode.Start ? StartRegion("Methods") : mode == CodeRegionMode.End ? EndRegion("Methods") : null;
@@ -127,7 +127,7 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         {
             //Delete the file if it exists
             if (File.Exists(FileOnDisk.FullName)) FileOnDisk.Delete();
-            
+
             // Only create the file if its missing
             if (!File.Exists(FileOnDisk.FullName))
             {
@@ -136,7 +136,7 @@ namespace XSDCustomToolVSIX.Generate_Helpers
                 {
                     if (OutputUnit == null)
                     {
-                        Generator.GenerateCodeFromStatement(ParsedFile.ObjectProvider.UnableToParseComment, writer, SaveOptions);
+                        Generator.GenerateCodeFromStatement(ParsedFile.CodeDomObjectProvider.UnableToParseComment, writer, SaveOptions);
                     }
                     else
                     {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace XSDCustomToolVSIX.Generate_Helpers
 {
-    internal class ObjectProvider_JSharp : ObjectProvider
+    internal class CodeDomObjectProvider_JSharp : CodeDomObjectProvider
     {
         public override CodeGenerator_HelperClass HelperClassGenerator(ParsedFile parsedfile) => new HelperClassGenerator_JSharp(parsedfile);
         public override CodeGenerator_SupplementFile SupplementFileGenerator(ParsedFile parsedfile) => new SupplementGenerator_JSharp(parsedfile);

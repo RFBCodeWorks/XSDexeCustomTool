@@ -8,7 +8,7 @@ using System.CodeDom.Compiler;
 
 namespace XSDCustomToolVSIX.Generate_Helpers
 {
-    /// <summary> This represents a class that was discovered when evaluting the output file from XSD.exe </summary>
+    /// <summary> This represents a class that was discovered when evaluting the output class file from XSD.exe </summary>
     internal class DiscoveredClass
     {
         
@@ -32,11 +32,11 @@ namespace XSDCustomToolVSIX.Generate_Helpers
                     case true when member.GetType() == typeof(CodeMemberProperty):
                         //Add the Property to the ClassProperty list
                         CodeMemberProperty prop = (CodeMemberProperty)member;
-                        ClassProperties.Add(ParsedFile.ObjectProvider.DiscoveredPropertyGenerator(prop, TryGetBackingField(prop), this));
+                        ClassProperties.Add(ParsedFile.CodeDomObjectProvider.DiscoveredPropertyGenerator(prop, TryGetBackingField(prop), this));
                         break;
                     case true when !HasProperties && member.GetType() == typeof(CodeMemberField):
                         //Add the Field to the ClassProperty list, since it should be a public field
-                        ClassProperties.Add(ParsedFile.ObjectProvider.DiscoveredPropertyGenerator(null, (CodeMemberField)member, this));
+                        ClassProperties.Add(ParsedFile.CodeDomObjectProvider.DiscoveredPropertyGenerator(null, (CodeMemberField)member, this));
                         break;
                     case true when member.GetType() == typeof(CodeMemberMethod):
                         //Currently Ignored
@@ -102,7 +102,7 @@ namespace XSDCustomToolVSIX.Generate_Helpers
         /// <summary>Returns a CodeMemberProperty Object for the HelperClass Property <br/>
         /// Overrides may return a CodeSnippet instead. </summary>
         internal virtual CodeTypeMemberCollection GetHelperClassProperty(bool isPublic = true)
-            => ParsedFile.ObjectProvider.CreateNew_CodeMemberProperty(
+            => ParsedFile.CodeDomObjectProvider.CreateNew_CodeMemberProperty(
                 name: this.HelperClass_PropertyName,
                 type: GetCodeTypeReference(),
                 attributes: MemberAttributes.Public,
