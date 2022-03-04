@@ -13,12 +13,12 @@ namespace XSDCustomToolVSIX.Interfaces
     interface ILinqClassGenerator
     {
         /// <summary> This is the FileInfo object that houses the path when writing this file to disk. </summary>
-        //FileInfo FileOnDisk { get; }
+        FileInfo FileOnDisk { get; }
 
         /// <summary>
         /// Run this method to create a supplement file for the parial classes XSD.exe generated. <br/>
         /// This method will end by calling <see cref="CodeGenerator_Base.Save(CodeCompileUnit);"/>
         /// </summary>
-        //void Generate();
+        void Generate();
     }
 }

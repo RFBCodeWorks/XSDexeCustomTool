@@ -8,9 +8,9 @@ using XSDCustomToolVSIX.Interfaces;
 
 namespace XSDCustomToolVSIX.Language_Specific_Overrides
 {
-    class LinqOverrides_CSharp : LinqClassGenerator_Base
+    internal class LinqOverrides_CSharp : LinqClassGenerator_Base
     {
+        public LinqOverrides_CSharp(IParsedFile parsedFile) : base(parsedFile) { }
 
-        protected override XSDCustomTool_ParametersXSDexeOptionsLanguage Language => XSDCustomTool_ParametersXSDexeOptionsLanguage.CS;
     }
 }

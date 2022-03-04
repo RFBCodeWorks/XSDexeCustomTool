@@ -93,13 +93,13 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
             //return retObj;
             string tab = "    ";
             string baseTab = $"{tab}{tab}{tab}";
-            tmp.Add($"{baseTab}{TopLevelClass.ClassName} retObj = null;");
+            tmp.Add($"{baseTab}{TopLevelClass.Name} retObj = null;");
             tmp.Add($"{baseTab}try");
             tmp.Add($"{baseTab}{{");
             tmp.Add($"{baseTab}{tab}using (Stream stream = File.Open(FilePath, FileMode.Open))");
             tmp.Add($"{baseTab}{tab}{{");
-            tmp.Add($"{baseTab}{tab}{tab}XmlSerializer serializer = new XmlSerializer(typeof({TopLevelClass.ClassName}));");
-            tmp.Add($"{baseTab}{tab}{tab}retObj = ({TopLevelClass.ClassName})serializer.Deserialize(stream);");
+            tmp.Add($"{baseTab}{tab}{tab}XmlSerializer serializer = new XmlSerializer(typeof({TopLevelClass.Name}));");
+            tmp.Add($"{baseTab}{tab}{tab}retObj = ({TopLevelClass.Name})serializer.Deserialize(stream);");
             tmp.Add($"{baseTab}{tab}}}");
             tmp.Add($"{baseTab}}}");
             tmp.Add($"{baseTab}catch (Exception E)");
@@ -136,7 +136,7 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
             tmp.Add($"{baseTab}{tab}Directory.CreateDirectory(new FileInfo(FilePath).DirectoryName);");
             tmp.Add($"{baseTab}{tab}using (Stream stream = File.Open(FilePath, FileMode.Create))");
             tmp.Add($"{baseTab}{tab}{{");
-            tmp.Add($"{baseTab}{tab}{tab}XmlSerializer serializer = new XmlSerializer(typeof({TopLevelClass.ClassName}));");
+            tmp.Add($"{baseTab}{tab}{tab}XmlSerializer serializer = new XmlSerializer(typeof({TopLevelClass.Name}));");
             tmp.Add($"{baseTab}{tab}{tab}serializer.Serialize(stream, this.{TopLevelClass.HelperClass_PropertyName});");
             tmp.Add($"{baseTab}{tab}{tab}stream.Flush();");
             tmp.Add($"{baseTab}{tab}}}");

@@ -9,7 +9,7 @@ using System.CodeDom.Compiler;
 namespace XSDCustomToolVSIX.BaseClasses
 {
     /// <summary> This represents a class that was discovered when evaluting the output class file from XSD.exe </summary>
-    internal class DiscoveredClass
+    internal class DiscoveredClass : ICodeMember
     {
         
         #region </ Construction >
@@ -73,10 +73,10 @@ namespace XSDCustomToolVSIX.BaseClasses
         internal ParsedFile ParsedFile { get; }
 
         /// <inheritdoc cref="CodeTypeDeclaration" />
-        internal protected CodeTypeDeclaration ParsedClass { get; }
+        public CodeTypeDeclaration ParsedClass { get; }
 
         /// <summary> This is the name of the class (the 'type' of the class.)</summary>
-        public string ClassName => ParsedClass.Name;
+        public string Name => ParsedClass.Name;
 
         /// <summary> Any properties discovered while parsing the class will be listed here. </summary>
         public List<DiscoveredProperty> ClassProperties { get; } = new List<DiscoveredProperty>();
@@ -88,16 +88,30 @@ namespace XSDCustomToolVSIX.BaseClasses
         private bool HasStaticConstructor => ParsedClass.Members.OfType<CodeTypeConstructor>().Count() > 0;
 
         /// <summary> This is the name of the property within the Helper class. </summary>
-        /// <returns>Base property returns the <see cref="DiscoveredClass.ClassName"/></returns>
-        public virtual string HelperClass_PropertyName => this.ClassName;
+        /// <returns>Base property returns the <see cref="DiscoveredClass.Name"/></returns>
+        public virtual string HelperClass_PropertyName => this.Name;
 
         #endregion </ Properties >
+
+        #region < ICodeMember Implementation >
+
+        public MemberAttributes Attributes => this.ParsedClass.Attributes;
+
+        public CodeTypeReference Type => GetCodeTypeReference();
+
+        CodeAttributeDeclarationCollection ICodeMember.CustomAttributes => ParsedClass.CustomAttributes;
+
+        CodeCommentStatementCollection ICodeMember.Comments => ParsedClass.Comments;
+
+        public CodeTypeMember GetCodeTypeMember() { return ParsedClass; }
+
+        #endregion
 
         #region < CodeDom >
 
         /// <summary>Returns new CodeTypeReference object for this class</summary>
-        /// <returns>new CodeTypeReference(this.ClassName)</returns>
-        internal virtual CodeTypeReference GetCodeTypeReference() => new CodeTypeReference(this.ClassName);
+        /// <returns>new CodeTypeReference(this.Name)</returns>
+        public virtual CodeTypeReference GetCodeTypeReference() => new CodeTypeReference(this.Name);
 
         /// <summary>Returns a CodeMemberProperty Object for the HelperClass Property <br/>
         /// Overrides may return a CodeSnippet instead. </summary>
@@ -114,7 +128,7 @@ namespace XSDCustomToolVSIX.BaseClasses
         /// <summary>
         /// This is the text to wrap within the &lt;summary&gt; brackets
         /// </summary>
-        protected virtual string GetHelperClassPropertySummaryText() => $"This Property Represents the <see cref=\"{ClassName}\"/> XML Object Class";
+        protected virtual string GetHelperClassPropertySummaryText() => $"This Property Represents the <see cref=\"{Name}\"/> XML Object Class";
 
         /// <summary>
         /// Wrap the result of <see cref="GetHelperClassPropertySummaryText"/> in &lt;summary&gt; brackets and return as a new <see cref="CodeCommentStatement"/>
@@ -123,6 +137,6 @@ namespace XSDCustomToolVSIX.BaseClasses
 
         #endregion </ CodeDom >
 
-        
+
     }
 }

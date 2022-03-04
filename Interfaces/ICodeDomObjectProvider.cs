@@ -61,6 +61,11 @@ namespace XSDCustomToolVSIX.Interfaces
         #region < Property Generation >
 
         /// <summary> Create a new <see cref="CodeMemberProperty"/> object with the supplied properties. </summary>
+        /// <param name="summaryComment">Comment String for the Summary Tag</param>
+        /// <inheritdoc cref="CreateStandard_CodeMemberProperty(string, CodeTypeReference, CodeMemberField, MemberAttributes, bool, CodeCommentStatementCollection)"/>
+        CodeMemberProperty CreateStandard_CodeMemberProperty(string name, CodeTypeReference type, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, string summaryComment = "");
+
+        /// <summary> Create a new <see cref="CodeMemberProperty"/> object with the supplied properties. </summary>
         /// <inheritdoc cref="CreateStandard_CodeMemberProperty(string, CodeTypeReference, CodeMemberField, MemberAttributes, bool, CodeCommentStatementCollection)"/>
         CodeMemberProperty CreateStandard_CodeMemberProperty(string name, CodeTypeReference type, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, CodeCommentStatementCollection comments = null);
 
@@ -95,6 +100,20 @@ namespace XSDCustomToolVSIX.Interfaces
         /// <param name="comment">Method Comment</param>
         /// <inheritdoc cref="CreateStandard_CodeMemberMethod(string, CodeTypeReference, MemberAttributes, CodeCommentStatementCollection, CodeStatementCollection, CodeParameterDeclarationExpressionCollection)"/>
         CodeMemberMethod CreateStandard_CodeMemberMethod(string methodName, CodeTypeReference returnType, MemberAttributes attributes, CodeCommentStatement comment, CodeStatementCollection statements);
+
+        #endregion
+
+        #region < Comment Generation >
+
+        CodeCommentStatement GenerateCodeComment(string comment = "", bool IsDocumentation = false);
+
+        CodeCommentStatementCollection GenerateCommentCollection(bool IsDocumentation, params string[] comments);
+
+        CodeCommentStatementCollection GenerateComment_Summary(params string[] comments);
+
+        CodeCommentStatementCollection GenerateComment_Remarks(params string[] comments);
+
+        CodeCommentStatementCollection GenerateComment_Returns(params string[] comments);
 
         #endregion
 

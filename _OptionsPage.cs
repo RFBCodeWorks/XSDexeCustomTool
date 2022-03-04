@@ -58,6 +58,13 @@ namespace XSDCustomToolVSIX
         //[DefaultValue(false)]
         //public bool GenerateNestedClasses { get; set; } = false;
 
+        [Category("LINQ Class Options")]
+        [DisplayName("Generate LINQ Class")]
+        [Description("Generate a class that houses an XDocument that is accessed using System.XML.LINQ" +
+            "\nNOTE: Currently only C# is supported for generating a helper class.")]
+        [DefaultValue(true)]
+        public bool GenerateLinqClass { get; set; } = true;
+
         #endregion </ CustomTool Options >
 
         #region < XSD.exe Options >

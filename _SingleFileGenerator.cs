@@ -126,6 +126,11 @@ namespace XSDCustomToolVSIX
                     Write("Generating Supplement File:", 7, false);
                     FileGenerator.SupplementFileGenerator.Generate();
                 }
+                if (false || !FileGenerator.LinqClassGenerator.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateLinqClass)
+                {
+                    Write("Generating LINQ File:", 7, false);
+                    FileGenerator.LinqClassGenerator.Generate();
+                }
 
                 // Pull the fully qualified resource name from the provided assembly
                 using (var resource = File.OpenRead(tmpPath)) //assembly.GetManifestResourceStream(InternalResourceName))

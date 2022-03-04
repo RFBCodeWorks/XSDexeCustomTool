@@ -13,6 +13,7 @@ namespace XSDCustomToolVSIX
 
         internal FileGenerator(XSD_Instance xSD) 
         {
+            this.XSD_Settings = xSD;
             var Lang = xSD.XSDexeOptions.Language;
             CodeDomObjectProvider = BaseClasses.CodeDomObjectProvider.Factory(Lang);
             ParsedFile = BaseClasses.ParsedFile.ParsedFileFactory(this);

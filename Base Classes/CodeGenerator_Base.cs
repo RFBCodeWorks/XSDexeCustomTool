@@ -38,6 +38,8 @@ namespace XSDCustomToolVSIX.BaseClasses
         /// </summary>
         protected CodeDomProvider LanguageProvider => ParsedFile.CodeDomObjectProvider.CodeDomProvider;
 
+        protected ICodeDomObjectProvider CodeProvider => ParsedFile.CodeDomObjectProvider;
+
         #endregion </ CodeDom >
 
         //////////////////////////////////////////////////////////////////////////////

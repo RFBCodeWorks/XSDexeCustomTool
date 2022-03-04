@@ -5,11 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.CodeDom;
 using XSDCustomToolVSIX.BaseClasses;
+using System.Collections;
 
 namespace XSDCustomToolVSIX
 {
     public static class ExtensionMethods
     {
+        /// <inheritdoc cref="CodeBinaryOperatorExpression.CodeBinaryOperatorExpression(CodeExpression, CodeBinaryOperatorType, CodeExpression)"/>
+        public static CodeBinaryOperatorExpression GenerateIfCondition(this CodeExpression left, CodeBinaryOperatorType op, CodeExpression right) => new CodeBinaryOperatorExpression(left, op, right);
+
+        /// <inheritdoc cref="CodeBinaryOperatorExpression.CodeBinaryOperatorExpression(CodeExpression, CodeBinaryOperatorType, CodeExpression)"/>
+        public static CodeBinaryOperatorExpression GenerateIfNullCondition(this CodeExpression left) => new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.ValueEquality, new CodePrimitiveExpression(null));
+
+        /// <inheritdoc cref="CodeBinaryOperatorExpression.CodeBinaryOperatorExpression(CodeExpression, CodeBinaryOperatorType, CodeExpression)"/>
+        public static CodeBinaryOperatorExpression GenerateIfNotNullCondition(this CodeExpression left) => new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null));
+
+
         /// <inheritdoc cref="Add(CodeCommentStatementCollection, string, bool)"/>
         public static int Add(this CodeCommentStatementCollection Collection, string text)
             => Collection.Add(new CodeCommentStatement(text));
@@ -92,5 +103,17 @@ namespace XSDCustomToolVSIX
         /// <returns></returns>
         public static bool AnyProtectionLevel(this IEnumerable<string> s)
             => s.Any("public", false) || s.Any("protected") || s.Any("internal") || s.Any("private", false);
+
+        public static object GetObject(this ICollection collection, int i)
+        {
+            int i2 = 0;
+            foreach(object obj in collection)
+            {
+                if (i2 == i) return obj;
+                i2++;
+            }
+            return null;
+        }
+
     }
 }

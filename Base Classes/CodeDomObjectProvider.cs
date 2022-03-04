@@ -105,6 +105,9 @@ namespace XSDCustomToolVSIX.BaseClasses
 
         #region With Backing Field
 
+        public CodeMemberProperty CreateStandard_CodeMemberProperty(string name, CodeTypeReference type, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, string summaryComment = "")
+            => CreateStandard_CodeMemberProperty(name, type, attributes, hasSet, GenerateComment_Summary(summaryComment));
+
         public virtual CodeTypeMemberCollection CreateNew_CodeMemberProperty(string name, CodeTypeReference type, CodeMemberField backingField, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, CodeCommentStatementCollection comments = null)
             => new CodeTypeMemberCollection { CreateStandard_CodeMemberProperty(name, type, backingField, attributes, hasSet, comments) };
 
@@ -125,6 +128,67 @@ namespace XSDCustomToolVSIX.BaseClasses
         #endregion
 
         #endregion </ MemberProperty Generation >
+
+        #region < Comment Generation >
+
+        /// <summary>
+        /// Generate a new Comment statement
+        /// </summary>
+        /// <param name="comment">Comment Text</param>
+        /// <param name="IsDocumentation">TRUE if the comment is for documentation (such as a summary tag), otherwise false</param>
+        /// <returns></returns>
+        public CodeCommentStatement GenerateCodeComment(string comment = "", bool IsDocumentation = false) => new CodeCommentStatement(comment, IsDocumentation);
+
+        public CodeCommentStatementCollection GenerateCommentCollection(bool IsDocumentation, params string[] comments)
+        {
+            var coll = new CodeCommentStatementCollection();
+            foreach (string c in comments)
+            {
+                coll.Add(new CodeCommentStatement(" " + c.Trim(), IsDocumentation));
+            }
+            return coll;
+        }
+
+        protected string[] ConvertStringParams(string firstLine, string[] middle, string lastLine)
+        {
+            List<string> tmp = new List<string> { firstLine };
+            tmp.AddRange(middle);
+            tmp.Add(lastLine);
+            return tmp.ToArray();
+        }
+
+        protected CodeCommentStatementCollection GenerateDocumentationComment(string DocumentationTag, params string[] comments)
+        {
+            string startTag = $" <{DocumentationTag}>";
+            string endTag = $" </{DocumentationTag}>";
+            switch (comments?.Length ?? 0)
+            {
+                case 0: return GenerateCommentCollection(true, $"{startTag}  {endTag}");
+                case 1: return GenerateCommentCollection(true, $"{startTag} {comments[0]} {endTag}");
+                default: return GenerateCommentCollection(true, ConvertStringParams(startTag, comments, endTag));
+            }
+        }
+
+        public CodeCommentStatementCollection GenerateComment_Summary(params string[] comments)
+        {
+            switch (comments?.Length ?? 0)
+            {
+                case 0: return GenerateCommentCollection(true, "<summary>", String.Empty, "</summary>");
+                default: return GenerateCommentCollection(true, ConvertStringParams("<summary>", comments, "</summary>"));
+            }
+        }
+
+        public CodeCommentStatementCollection GenerateComment_Remarks(params string[] comments)
+        {
+            return GenerateDocumentationComment("remarks", comments);               
+        }
+
+        public CodeCommentStatementCollection GenerateComment_Returns(params string[] comments)
+        {
+            return GenerateDocumentationComment("returns", comments);
+        }
+
+        #endregion
 
         #region < Method Generation >
 
