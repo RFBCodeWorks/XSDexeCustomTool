@@ -7,16 +7,15 @@ using System.Text;
 using System.Threading.Tasks;
 using XSDCustomToolVSIX.BaseClasses;
 using XSDCustomToolVSIX.Interfaces;
+using System.CodeDom.Compiler;
 
 namespace XSDCustomToolVSIX.Language_Specific_Overrides
 {
     internal class CodeDomObjectProvider_JS : CodeDomObjectProvider
     {
-        public override CodeGenerator_HelperClass HelperClassGenerator(ParsedFile parsedfile) => new HelperClassGenerator_JS(parsedfile);
-        public override CodeGenerator_SupplementFile SupplementFileGenerator(ParsedFile parsedfile) => new SupplementGenerator_JS(parsedfile);
-        public override DiscoveredEnum DiscoveredEnumGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredEnum(type, parsedfile);
-        public override DiscoveredClass DiscoveredClassGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredClass(type, parsedfile);
-        public override DiscoveredProperty DiscoveredPropertyGenerator(CodeMemberProperty Prop, CodeMemberField backingField, DiscoveredClass parentClass) => new DiscoveredProperty(Prop, backingField, parentClass);
+        public override XSDCustomTool_ParametersXSDexeOptionsLanguage Language => XSDCustomTool_ParametersXSDexeOptionsLanguage.JS;
+        public override CodeDomProvider CodeDomProvider => domProvider;
+        private static CodeDomProvider domProvider = new Microsoft.JScript.JScriptCodeProvider();
         public override CodeCommentStatement UnableToParseComment => new CodeCommentStatement("Unable to automatically generate this file -- JavaScript Language Parser not implemented yet.");
 
         public override CodeTypeMemberCollection CreateNew_CodeMemberProperty(string name, CodeTypeReference type, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, CodeCommentStatementCollection comments = null)
@@ -61,7 +60,7 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
 
     internal class SupplementGenerator_JS : CodeGenerator_SupplementFile
     {
-        internal SupplementGenerator_JS(ParsedFile ParsedFile) : base(ParsedFile) { }
+        internal SupplementGenerator_JS(IParsedFile ParsedFile) : base(ParsedFile) { }
 
         protected override CodeTypeMember ShouldSerializeProperty(string PropName)
         {
@@ -76,7 +75,7 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
 
     internal class HelperClassGenerator_JS : CodeGenerator_HelperClass
     {
-        internal HelperClassGenerator_JS(ParsedFile parsedFile) : base(parsedFile) { }
+        internal HelperClassGenerator_JS(IParsedFile parsedFile) : base(parsedFile) { }
 
         protected override CodeStatementCollection GetClassLoaderMethodStatements()
         {
@@ -160,7 +159,7 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
 
     internal class ParsedFile_JS : ParsedFile
     {
-        internal ParsedFile_JS(XSD_Instance xsd) : base(xsd) { }
+        internal ParsedFile_JS(IFileGenerator fileGenerator) : base(fileGenerator) { }
 
         #region < ReadInClassFile >
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.CodeDom;
 using XSDCustomToolVSIX.Interfaces;
 using XSDCustomToolVSIX.Language_Specific_Overrides;
+using System.CodeDom.Compiler;
 
 namespace XSDCustomToolVSIX.BaseClasses
 {
@@ -14,17 +15,18 @@ namespace XSDCustomToolVSIX.BaseClasses
     /// These methods are called by all the base classes, so that CodeSnippets may be used in place of the CodeDom objects. <br/>
     /// For example, if you want a one-line CodeMemberProperty as the standard, you have to override the <see cref="CreateNew_CodeMemberProperty"/> call with a CodeSnippet.
     /// </summary>
-    internal class CodeDomObjectProvider : ICodeDomObjectProvider
+    internal abstract class CodeDomObjectProvider : ICodeDomObjectProvider
     {
 
         #region < Class Factory >
 
-        private static CodeDomObjectProvider_CSharp CSharpProvider = new CodeDomObjectProvider_CSharp();
-        private static CodeDomObjectProvider_VB VBProvider = new CodeDomObjectProvider_VB();
-        private static CodeDomObjectProvider_JS JSProvider = new CodeDomObjectProvider_JS();
-        private static CodeDomObjectProvider_JSharp JSharpProvider = new CodeDomObjectProvider_JSharp();
+        private readonly static CodeDomObjectProvider_CSharp CSharpProvider = new CodeDomObjectProvider_CSharp();
+        private readonly static CodeDomObjectProvider_VB VBProvider = new CodeDomObjectProvider_VB();
+        private readonly static CodeDomObjectProvider_JS JSProvider = new CodeDomObjectProvider_JS();
+        private readonly static CodeDomObjectProvider_JSharp JSharpProvider = new CodeDomObjectProvider_JSharp();
+        //private readonly static CodeDomObjectProvider DefaultProvider = new CodeDomObjectProvider();
 
-        internal static ICodeDomObjectProvider GetObjectProvider(XSDCustomTool_ParametersXSDexeOptionsLanguage lang)
+        internal static ICodeDomObjectProvider Factory(XSDCustomTool_ParametersXSDexeOptionsLanguage lang)
         {
             switch (lang)
             {
@@ -32,26 +34,22 @@ namespace XSDCustomToolVSIX.BaseClasses
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.VB: return VBProvider;
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.JS: return JSProvider;
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.VJS: return JSharpProvider;
-                default: throw new NotImplementedException();
+                default: throw new NotImplementedException("Unknown Language Type - Must use language that specifies System.CodeDom.Compiler.CodeDomProvider");  // return DefaultProvider;
             }
         }
 
         #endregion
 
-        /// <summary>Override this method to create a derived CodeGenerator_HelperClass instead of the base CodeGenerator_HelperClass </summary>
-        public virtual CodeGenerator_HelperClass HelperClassGenerator(ParsedFile parsedfile) => new CodeGenerator_HelperClass(parsedfile);
+        #region < Abstract Properties >
 
-        /// <summary>Override this method to create a derived CodeGenerator_SupplementFile instead of the base CodeGenerator_SupplementFile </summary>
-        public virtual CodeGenerator_SupplementFile SupplementFileGenerator(ParsedFile parsedfile) => new CodeGenerator_SupplementFile(parsedfile);
+        public abstract XSDCustomTool_ParametersXSDexeOptionsLanguage Language { get; }
+        public abstract System.CodeDom.Compiler.CodeDomProvider CodeDomProvider { get; }
 
-        /// <summary>Override this method to create a derived DiscoveredEnum instead of the base DiscoveredEnum </summary>
-        public virtual DiscoveredEnum DiscoveredEnumGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredEnum(type, parsedfile);
+        public virtual System.CodeDom.Compiler.CodeGeneratorOptions CodeGeneratorOptions { get; } = new System.CodeDom.Compiler.CodeGeneratorOptions { BlankLinesBetweenMembers = true };
 
-        /// <summary>Override this method to create a derived DiscoveredClass instead of the base DiscoveredClass </summary>
-        public virtual DiscoveredClass DiscoveredClassGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredClass(type, parsedfile);
+        public string FileExtension => CodeDomProvider.FileExtension;
 
-        /// <summary>Override this method to create a derived DiscoveredProperty instead of the base DiscoveredProperty </summary>
-        public virtual DiscoveredProperty DiscoveredPropertyGenerator(CodeMemberProperty Prop, CodeMemberField backingField, DiscoveredClass parentClass) => new DiscoveredProperty(Prop, backingField, parentClass);
+        #endregion
 
         public readonly CodeCommentStatementCollection EmptySummaryTag = new CodeCommentStatementCollection { new CodeCommentStatement("<summary>  </summary>", true) };
 
@@ -82,15 +80,15 @@ namespace XSDCustomToolVSIX.BaseClasses
 
         #region No Backing Field
 
-        
+
         public virtual CodeTypeMemberCollection CreateNew_CodeMemberProperty(string name, CodeTypeReference type, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, CodeCommentStatementCollection comments = null)
             => new CodeTypeMemberCollection { CreateStandard_CodeMemberProperty(name, type, attributes, hasSet, comments) };
 
-        
+
         public CodeTypeMemberCollection CreateNew_CodeMemberProperty(string name, string type, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, CodeCommentStatementCollection comments = null)
             => CreateNew_CodeMemberProperty(name, new CodeTypeReference(type), attributes, hasSet, comments);
 
-        
+
         public CodeMemberProperty CreateStandard_CodeMemberProperty(string name, CodeTypeReference type, MemberAttributes attributes = MemberAttributes.Public, bool hasSet = true, CodeCommentStatementCollection comments = null)
         {
             CodeMemberProperty tmp = new CodeMemberProperty();
@@ -149,7 +147,7 @@ namespace XSDCustomToolVSIX.BaseClasses
 
         public CodeCommentStatement GetMethodParamComment(CodeParameterDeclarationExpression param, string description) => GetMethodParamComment(param.Name, description);
 
-        public CodeCommentStatement GetMethodParamComment(string paramName, string description) => new CodeCommentStatement($"<param name=\"{paramName}\">{description}</param>");        
+        public CodeCommentStatement GetMethodParamComment(string paramName, string description) => new CodeCommentStatement($"<param name=\"{paramName}\">{description}</param>");
 
         #endregion </ Method Generation >
 

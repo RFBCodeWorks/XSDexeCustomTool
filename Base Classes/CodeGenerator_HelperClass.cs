@@ -6,18 +6,41 @@ using System.Text;
 using System.Threading.Tasks;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using XSDCustomToolVSIX.Interfaces;
+using XSDCustomToolVSIX.Language_Specific_Overrides;
 
 namespace XSDCustomToolVSIX.BaseClasses
 {
-    internal class CodeGenerator_HelperClass : CodeGenerator_Base
+    internal class CodeGenerator_HelperClass : CodeGenerator_Base, ICodeGenerator_HelperClass
     {
 
-        internal CodeGenerator_HelperClass(ParsedFile parsedFile) : base(parsedFile) { }
+        #region < Class Factory >
+
+        protected CodeGenerator_HelperClass(IParsedFile parsefFile) : base(parsefFile) { }
+
+        internal static ICodeGenerator_HelperClass Factory(IParsedFile parsedFile)
+        {
+            switch (parsedFile.xSD_Instance.XSDexeOptions.Language)
+            {
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.CS:
+                    return new HelperClassGenerator_CSharp(parsedFile);
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VB:
+                    return new HelperClassGenerator_VB(parsedFile);
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VJS:
+                    return new HelperClassGenerator_JSharp(parsedFile);
+                case XSDCustomTool_ParametersXSDexeOptionsLanguage.JS:
+                    return new HelperClassGenerator_JS(parsedFile);
+                default:
+                    return new CodeGenerator_HelperClass(parsedFile);
+            }
+        }
+
+        #endregion
 
         #region < Properties >
 
         /// <summary> Location of the _HelperClass file on disk. </summary>
-        public override FileInfo FileOnDisk => new FileInfo(ParsedFile.xSD_Instance.InputFile.FullName.Replace(".xsd", $"_HelperClass.{ParsedFile.OutputFileExtension}"));
+        public override FileInfo FileOnDisk => new FileInfo(ParsedFile.xSD_Instance.InputFile.FullName.Replace(".xsd", $"_HelperClass.{ParsedFile.CodeDomObjectProvider.FileExtension}"));
 
         /// <summary> Name of the output class when generating the helper file. </summary>
         public virtual string OutputClassName => this.ParsedFile.xSD_Instance.InputFile.Name.Replace(".xsd", "_HelperClass");
@@ -65,7 +88,7 @@ namespace XSDCustomToolVSIX.BaseClasses
             GenerateSaverAndLoader(@class); //XML Serialization
 
             @namespace.Types.Add(@class);
-            Save:
+        //Save:
             base.Save(OutputFile, false);
         }
 
@@ -96,7 +119,7 @@ namespace XSDCustomToolVSIX.BaseClasses
             CodeTypeMember tmp = new CodeTypeMember();
             tmp.StartDirectives.Add(Region_Constructor(CodeRegionMode.Start));
             @class.Members.Add(tmp);
-            
+
             @class.Members.Add(GenerateConstructor_Parameterless());
             @class.Members.Add(GenerateConstructor_FilePathArg());
             @class.Members.Add(GenerateConstructor_DeserializedXML());
@@ -106,7 +129,7 @@ namespace XSDCustomToolVSIX.BaseClasses
             @class.Members.Add(tmp);
         }
 
-        protected virtual CodeConstructor GenerateConstructor_Parameterless() 
+        protected virtual CodeConstructor GenerateConstructor_Parameterless()
         {
             CodeConstructor cstr = new CodeConstructor();
             cstr.Attributes = MemberAttributes.Public;
@@ -119,7 +142,7 @@ namespace XSDCustomToolVSIX.BaseClasses
             return cstr;
         }
 
-        protected virtual CodeConstructor GenerateConstructor_FilePathArg() 
+        protected virtual CodeConstructor GenerateConstructor_FilePathArg()
         {
             CodeConstructor cstr = new CodeConstructor();
             cstr.Attributes = MemberAttributes.Public;
@@ -132,8 +155,8 @@ namespace XSDCustomToolVSIX.BaseClasses
             cstr.Statements.Add(new CodeAssignStatement(Left, Right));
             return cstr;
         }
-        
-        protected virtual CodeConstructor GenerateConstructor_DeserializedXML() 
+
+        protected virtual CodeConstructor GenerateConstructor_DeserializedXML()
         {
             CodeConstructor cstr = new CodeConstructor();
             cstr.Attributes = MemberAttributes.Public;
@@ -144,7 +167,7 @@ namespace XSDCustomToolVSIX.BaseClasses
             cstr.Statements.Add(new CodeAssignStatement(
                 left: new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), TopLevelClass?.HelperClass_PropertyName ?? "FAULT"),
                 right: new CodeVariableReferenceExpression(varRef)
-                ));                
+                ));
             return cstr;
         }
 
@@ -153,14 +176,14 @@ namespace XSDCustomToolVSIX.BaseClasses
         #region < Properties >
 
         /// <summary></summary>
-        protected virtual void GenerateProperties(CodeTypeDeclaration @class) 
+        protected virtual void GenerateProperties(CodeTypeDeclaration @class)
         {
             CodeTypeMember tmp = new CodeTypeMember();
             tmp.StartDirectives.Add(StartRegion("Properties"));
             @class.Members.Add(tmp);
-            
+
             @class.Members.AddRange(TopLevelClass.GetHelperClassProperty());
-            
+
             tmp = new CodeTypeMember();
             tmp.EndDirectives.Add(EndRegion("Properties"));
             @class.Members.Add(tmp);
@@ -170,7 +193,7 @@ namespace XSDCustomToolVSIX.BaseClasses
 
         #region < Saving and Loading >
 
-        protected virtual void GenerateSaverAndLoader(CodeTypeDeclaration @class) 
+        protected virtual void GenerateSaverAndLoader(CodeTypeDeclaration @class)
         {
             CodeTypeMember tmp = new CodeTypeMember();
             tmp.StartDirectives.Add(StartRegion("Saving & Loading XML Files"));
@@ -192,7 +215,7 @@ namespace XSDCustomToolVSIX.BaseClasses
         /// <returns>Base method returns a CodeMemberMethod wrapped into a CodeTypeMemberCollection</returns>
         protected virtual CodeTypeMemberCollection GetClassLoaderMethod()
         {
-            
+
             CodeMemberMethod tmp = new CodeMemberMethod();
             tmp.Name = "LoadXmlFile";
             tmp.Attributes = MemberAttributes.Private;
@@ -285,10 +308,10 @@ namespace XSDCustomToolVSIX.BaseClasses
             //Wrap the statements into a TryCatch Statement
             tmp.Add(new CodeTryCatchFinallyStatement(TryStatements.ToArray(), new CodeCatchClause[] { CatchClause }, FinallyStatements.ToArray()));
             tmp.Add(new CodeMethodReturnStatement(RetObjRef));
-            
+
             return tmp;
         }
-        
+
         #endregion </ Loading >
 
         #region < Saving >

@@ -1,12 +1,37 @@
 ﻿using System.CodeDom;
 
 namespace XSDCustomToolVSIX.Interfaces
-{
+{    
     /// <summary>
     /// Interface for the Language-specific CodeDomObjectProvider methods
     /// </summary>
     internal interface ICodeDomObjectProvider
     {
+
+        /// <summary>
+        /// CodeDomeProvider that provides the ability to Generate and Parse code for some language
+        /// </summary>
+        System.CodeDom.Compiler.CodeDomProvider CodeDomProvider { get; }
+
+        /// <summary>
+        /// Provides Default Options for when writing to a CodeDomCompileUnit to a file
+        /// </summary>
+        System.CodeDom.Compiler.CodeGeneratorOptions CodeGeneratorOptions { get; }
+
+        /// <summary>
+        /// Provide a Comment Statement declaring that the file was unable to be parsed.
+        /// </summary>
+        CodeCommentStatement UnableToParseComment { get; }
+
+        /// <summary>
+        /// Specifies the Language in use
+        /// </summary>
+        XSDCustomTool_ParametersXSDexeOptionsLanguage Language { get; }
+
+        /// <summary>
+        /// <inheritdoc cref="System.CodeDom.Compiler.CodeDomProvider.FileExtension"/>
+        /// </summary>
+        string FileExtension { get; }
 
         /// <summary>
         /// Convert a <see cref="MemberAttributes"/> object to its language-specific string representation

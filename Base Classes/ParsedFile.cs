@@ -9,8 +9,9 @@ using XSDCustomToolVSIX.BaseClasses;
 using XSDCustomToolVSIX.Language_Specific_Overrides;
 using System.CodeDom;
 using XSDCustomToolVSIX.Interfaces;
+using System.CodeDom.Compiler;
 
-namespace XSDCustomToolVSIX
+namespace XSDCustomToolVSIX.BaseClasses
 {
     /// <summary>
     /// Contains the CodeDomCompileUnit read by the <see cref="LanguageProvider"/>, and contains references to the additionalCode Generators. <br/>
@@ -21,68 +22,38 @@ namespace XSDCustomToolVSIX
         #region < Class Factory >
 
         private ParsedFile() { }
-        protected ParsedFile(XSD_Instance xsdInstance)
+        protected ParsedFile(IFileGenerator fileGenerator)
         {
-            this.xSD_Instance = xsdInstance;
+            MasterFileGenerator = fileGenerator;
             LazyParsedCode = new Lazy<CodeCompileUnit>(() => ReadInClassFile());
             LazyDiscoveredClasses = new Lazy<DiscoveredClass[]>(() => GetDiscoveredClasses());
             LazyDiscoveredEnums = new Lazy<DiscoveredEnum[]>(() => GetDiscoveredEnums());
             TopLevelClassAssumption = new Lazy<DiscoveredClass>(() => DiscoveredClasses[0]);
         }
 
-        internal static IParsedFile ParsedFileFactory(XSD_Instance xSD)
+        internal static IParsedFile ParsedFileFactory(IFileGenerator fileGenerator)
         {
-            ParsedFile output = null;
-            switch (xSD.XSDexeOptions.Language)
+            var Lang = fileGenerator.XSD_Settings.XSDexeOptions.Language;
+            switch (Lang)
             {
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.CS:
-                    output = new ParsedFile_CSharp(xSD);
-                    output.CodeDomObjectProvider = new CodeDomObjectProvider_CSharp();
-                    break;
+                    return new ParsedFile_CSharp(fileGenerator);
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.VB:
-                    output = new ParsedFile_VB(xSD);
-                    output.CodeDomObjectProvider = new CodeDomObjectProvider_VB();
-                    break;
+                    return new ParsedFile_VB(fileGenerator);
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.JS:
-                    output = new ParsedFile_JS(xSD);
-                    output.CodeDomObjectProvider = new CodeDomObjectProvider_JS();
-                    break;
+                    return new ParsedFile_JS(fileGenerator);
                 case XSDCustomTool_ParametersXSDexeOptionsLanguage.VJS:
-                    output = new ParsedFile_JSharp(xSD);
-                    output.CodeDomObjectProvider = new CodeDomObjectProvider_JSharp();
-                    break;
+                    return new ParsedFile_JSharp(fileGenerator);
                 default:
-                    output = new ParsedFile(xSD);
-                    output.CodeDomObjectProvider = new CodeDomObjectProvider();
-                    break;
+                    return new ParsedFile(fileGenerator);
             }
-            output.LanguageProvider = output.GetCodeDomProvider();
-            output.HelperClass = output.CodeDomObjectProvider.HelperClassGenerator(output);
-            output.Supplement = output.CodeDomObjectProvider.SupplementFileGenerator(output);
-            return output;
-
-
-        }
-
-        /// <summary></summary>
-        /// <returns></returns>
-        private System.CodeDom.Compiler.CodeDomProvider GetCodeDomProvider()
-        {
-            string lang = System.CodeDom.Compiler.CodeDomProvider.GetLanguageFromExtension(this.xSD_Instance.OutputFile.Extension);
-            switch (this.xSD_Instance.XSDexeOptions.Language)
-            {
-                case XSDCustomTool_ParametersXSDexeOptionsLanguage.CS: return new Microsoft.CSharp.CSharpCodeProvider();
-                case XSDCustomTool_ParametersXSDexeOptionsLanguage.VB: return new Microsoft.VisualBasic.VBCodeProvider();
-                case XSDCustomTool_ParametersXSDexeOptionsLanguage.JS: return new Microsoft.JScript.JScriptCodeProvider();
-                default:
-                    throw new NotImplementedException("Unknown Language Type - Must use language that specifies System.CodeDom.Compiler.CodeDomProvider");
-            }
-
         }
 
         #endregion </ Class Factory >
 
         #region < Properties >
+
+        #region < Private Properties & References >
 
         private readonly Lazy<CodeCompileUnit> LazyParsedCode;
         private readonly Lazy<DiscoveredClass[]> LazyDiscoveredClasses;
@@ -90,16 +61,25 @@ namespace XSDCustomToolVSIX
         private readonly Lazy<DiscoveredClass> TopLevelClassAssumption; //Assume that first class found is top level class
         private DiscoveredClass TopLevelClassField = null;
 
-        /// <inheritdoc cref="XSDCustomToolVSIX.BaseClasses.CodeDomObjectProvider"/>
-        public CodeDomObjectProvider CodeDomObjectProvider { get; private set; }
 
+        /// <inheritdoc cref="IFileGenerator"/>
+        protected IFileGenerator MasterFileGenerator { get; }
+
+        /// <inheritdoc cref="IFileGenerator.XSD_Settings"/>
+        public XSD_Instance xSD_Instance => MasterFileGenerator.XSD_Settings;
+
+        ///<inheritdoc cref="XSD_Instance.OutputFile"/>
+        protected FileInfo GeneratedFile => xSD_Instance.OutputFile;
+
+        /// <inheritdoc cref="ICodeDomObjectProvider"/>
+        public ICodeDomObjectProvider CodeDomObjectProvider => MasterFileGenerator.CodeDomObjectProvider;
+
+        /// <inheritdoc cref="ICodeDomObjectProvider.CodeDomProvider"/>
+        public CodeDomProvider LanguageProvider => MasterFileGenerator.CodeDomObjectProvider.CodeDomProvider;
+
+        #endregion
 
         #region < CodeDom - Lanugage Parse & Provider >
-
-        /// <summary>
-        /// This is the CodeDomProvider that provides the syntax for generating code for the provider's language.
-        /// </summary>
-        public System.CodeDom.Compiler.CodeDomProvider LanguageProvider { get; private set; }
 
         /// <summary>
         /// The resulting <see cref="System.CodeDom.CodeCompileUnit"/> unit that represents the code generated by XSD.exe
@@ -111,21 +91,9 @@ namespace XSDCustomToolVSIX
         /// </summary>
         public System.CodeDom.CodeTypeDeclarationCollection DiscoveredTypes => this.TargetNameSpace.Types;
 
-        /// <inheritdoc cref="System.CodeDom.Compiler.CodeDomProvider.FileExtension"/>
-        public virtual string OutputFileExtension => LanguageProvider.FileExtension;
-
-        public System.CodeDom.Compiler.CodeGeneratorOptions CodeGeneratorOptions { get; }
-            = new System.CodeDom.Compiler.CodeGeneratorOptions { BlankLinesBetweenMembers = true };
-
-        #endregion < CodeDom - Lanugage Parse & Provider >
-
-        /// <summary> HelperClass File Generator </summary>
-        public CodeGenerator_HelperClass HelperClass { get; private set; }
-
-        /// <summary> AutoGenerated_Supplement File Generator </summary>
-        public CodeGenerator_SupplementFile Supplement { get; private set; }
-
-        /// <summary>The CodeNameSpace object that contains all the objects produced by XSD.exe </summary>
+        /// <summary>
+        /// The CodeNameSpace object that contains all the objects produced by XSD.exe 
+        /// </summary>
         public CodeNamespace TargetNameSpace
         {
             get
@@ -138,33 +106,30 @@ namespace XSDCustomToolVSIX
             }
         }
 
-        /// <summary> DiscoveredClass array set after <see cref="ReadInClassFile"/> has completed. </summary>
+        #endregion
+
+        #region < Discovered Types >
+
+        /// <summary> 
+        /// DiscoveredClass array set after <see cref="ReadInClassFile"/> has completed. 
+        /// </summary>
         public DiscoveredClass[] DiscoveredClasses => LazyDiscoveredClasses.Value;
 
-        /// <summary> DiscoveredClass array set after <see cref="ReadInClassFile"/> has completed. </summary>
+        /// <summary>
+        /// DiscoveredClass array set after <see cref="ReadInClassFile"/> has completed. 
+        /// </summary>
         public DiscoveredEnum[] DiscoveredEnums => LazyDiscoveredEnums.Value;
 
-        /// <summary> <see cref="ReadInClassFile"/> sets the first class found as the TopLevelClass, though this may be incorrect. </summary>
+        /// <summary> 
+        /// <see cref="ReadInClassFile"/> sets the first class found as the TopLevelClass, though this may be incorrect. 
+        /// </summary>
         public DiscoveredClass TopLevelClass
         {
             get => TopLevelClassField ?? TopLevelClassAssumption.Value;
             protected set => this.TopLevelClassField = value;
         }
 
-        #region < XSD_Instance -- Settings for helpers and the output of XSD.exe >
-
-        /// <summary> This is the instance of XSD settings to work with. </summary>
-        public XSD_Instance xSD_Instance { get; }
-
-        ///<inheritdoc cref="XSD_Instance.OutputFile"/>
-        protected FileInfo GeneratedFile => xSD_Instance.OutputFile;
-
-        public bool IsGeneratingClass => xSD_Instance.IsGeneratingClass;
-
-        public bool IsGeneratingDataSet => xSD_Instance.IsGeneratingDataSet;
-
-        #endregion < XSD_Instance -- Settings for helpers and the output of XSD.exe >
-
+        #endregion
         #endregion </ Properties >
 
         #region < ReadInClassFile >
@@ -221,7 +186,7 @@ namespace XSDCustomToolVSIX
             List<DiscoveredClass> list = new List<DiscoveredClass>();
             foreach (CodeTypeDeclaration type in TargetNameSpace.Types.Where((CodeTypeDeclaration d) => d.IsClass))
             {
-                list.Add(CodeDomObjectProvider.DiscoveredClassGenerator(type, this));
+                list.Add(DiscoveredClassGenerator(type, this));
             }
             return list.ToArray();
         }
@@ -235,12 +200,19 @@ namespace XSDCustomToolVSIX
             List<DiscoveredEnum> list = new List<DiscoveredEnum>();
             foreach (CodeTypeDeclaration type in TargetNameSpace.Types.Where((CodeTypeDeclaration d) => d.IsEnum))
             {
-                list.Add(CodeDomObjectProvider.DiscoveredEnumGenerator(type, this));
+                list.Add(DiscoveredEnumGenerator(type, this));
             }
             return list.ToArray();
         }
 
+        /// <summary>Override this method to create a derived DiscoveredEnum instead of the base DiscoveredEnum </summary>
+        public virtual DiscoveredEnum DiscoveredEnumGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredEnum(type, parsedfile);
 
+        /// <summary>Override this method to create a derived DiscoveredClass instead of the base DiscoveredClass </summary>
+        public virtual DiscoveredClass DiscoveredClassGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredClass(type, parsedfile);
+
+        /// <summary>Override this method to create a derived DiscoveredProperty instead of the base DiscoveredProperty </summary>
+        public virtual DiscoveredProperty DiscoveredPropertyGenerator(CodeMemberProperty Prop, CodeMemberField backingField, DiscoveredClass parentClass) => new DiscoveredProperty(Prop, backingField, parentClass);
 
         #endregion </ ReadInClassFile >
 

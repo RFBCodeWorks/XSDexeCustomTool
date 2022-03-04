@@ -16,14 +16,14 @@ namespace XSDCustomToolVSIX.BaseClasses
     /// Uses the <see cref="CodeDomProvider"/> selected by the <see cref="ParsedFile.LanguageProvider"/> to Save the the code to text. <br/>
     /// This class  also provides the methods shared across all generated files.
     /// </summary>
-    internal abstract class CodeGenerator_Base : IClassGenerator
+    internal abstract class CodeGenerator_Base : Interfaces.ICodeGenerator
     {
         private CodeGenerator_Base() { }
 
-        protected CodeGenerator_Base(ParsedFile parsedFile) { this.ParsedFile = parsedFile; }
+        protected CodeGenerator_Base(IParsedFile parsedFile) { this.ParsedFile = parsedFile; }
 
         /// <summary> Reference to ParsedFile object that controls which Generators are firing. </summary>
-        internal protected ParsedFile ParsedFile { get; }
+        internal protected IParsedFile ParsedFile { get; }
 
         /// <summary> This is the FileInfo object that houses the path when writing this file to disk. </summary>
         public abstract FileInfo FileOnDisk { get; }
@@ -33,7 +33,10 @@ namespace XSDCustomToolVSIX.BaseClasses
 
         #region < CodeDom >
 
-        protected virtual CodeDomProvider LanguageProvider => ParsedFile.LanguageProvider;
+        /// <summary>
+        /// <inheritdoc cref="CodeDomObjectProvider.CodeDomProvider"/>
+        /// </summary>
+        protected CodeDomProvider LanguageProvider => ParsedFile.CodeDomObjectProvider.CodeDomProvider;
 
         #endregion </ CodeDom >
 
@@ -132,7 +135,7 @@ namespace XSDCustomToolVSIX.BaseClasses
             // Only create the file if its missing
             if (!File.Exists(FileOnDisk.FullName))
             {
-                ICodeGenerator Generator = LanguageProvider.CreateGenerator(this.FileOnDisk.FullName);
+                System.CodeDom.Compiler.ICodeGenerator Generator = LanguageProvider.CreateGenerator(this.FileOnDisk.FullName);
                 using (IndentedTextWriter writer = new IndentedTextWriter(new StreamWriter(FileOnDisk.FullName)))
                 {
                     if (OutputUnit == null)

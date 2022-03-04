@@ -115,16 +115,16 @@ namespace XSDCustomToolVSIX
                 //MakeCorrectionsToXSDexeOutputFile(xsdParams);
 
                 //Step 6: Evaluate the output file and generate the helper class if it is missing
-                IParsedFile FileGenerator = ParsedFile.ParsedFileFactory(xsdParams);
-                if (false || !FileGenerator.HelperClass.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                IFileGenerator FileGenerator = new FileGenerator(xsdParams);
+                if (false || !FileGenerator.HelperClassGenerator.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                 {
                     Write("Generating helper class:", 6, false);
-                    FileGenerator.HelperClass.Generate();
+                    FileGenerator.HelperClassGenerator.Generate();
                 }
-                if (false || !FileGenerator.Supplement.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
+                if (false || !FileGenerator.SupplementFileGenerator.FileOnDisk.Exists && OptionsProvider.GetUserDefaults().GenerateHelperClass)
                 {
                     Write("Generating Supplement File:", 7, false);
-                    FileGenerator.Supplement.Generate();
+                    FileGenerator.SupplementFileGenerator.Generate();
                 }
 
                 // Pull the fully qualified resource name from the provided assembly

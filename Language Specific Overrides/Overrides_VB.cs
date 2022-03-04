@@ -7,17 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 using XSDCustomToolVSIX.BaseClasses;
 using XSDCustomToolVSIX.Interfaces;
+using System.CodeDom.Compiler;
 
 namespace XSDCustomToolVSIX.Language_Specific_Overrides
 
 {
     internal class CodeDomObjectProvider_VB : CodeDomObjectProvider
     {
-        public override CodeGenerator_HelperClass HelperClassGenerator(ParsedFile parsedfile) => new HelperClassGenerator_VB(parsedfile);
-        public override CodeGenerator_SupplementFile SupplementFileGenerator(ParsedFile parsedfile) => new SupplementGenerator_VB(parsedfile);
-        public override DiscoveredEnum DiscoveredEnumGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredEnum(type, parsedfile);
-        public override DiscoveredClass DiscoveredClassGenerator(CodeTypeDeclaration type, ParsedFile parsedfile) => new DiscoveredClass(type, parsedfile);
-        public override DiscoveredProperty DiscoveredPropertyGenerator(CodeMemberProperty Prop, CodeMemberField backingField, DiscoveredClass parentClass) => new DiscoveredProperty(Prop, backingField, parentClass);
+        public override XSDCustomTool_ParametersXSDexeOptionsLanguage Language => XSDCustomTool_ParametersXSDexeOptionsLanguage.VB;
+        public override CodeDomProvider CodeDomProvider => domProvider;
+        private static CodeDomProvider domProvider = new Microsoft.VisualBasic.VBCodeProvider();
+        
         
         public override CodeCommentStatement UnableToParseComment => new CodeCommentStatement("Unable to automatically generate this file -- JavaScript Language Parser not implemented yet.");
         
@@ -63,7 +63,7 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
 
     internal class SupplementGenerator_VB : CodeGenerator_SupplementFile
     {
-        internal SupplementGenerator_VB(ParsedFile ParsedFile) : base(ParsedFile) { }
+        internal SupplementGenerator_VB(IParsedFile ParsedFile) : base(ParsedFile) { }
 
         protected override CodeTypeMember ShouldSerializeProperty(string PropName)
         {
@@ -78,7 +78,7 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
 
     internal class HelperClassGenerator_VB : CodeGenerator_HelperClass
     {
-        internal HelperClassGenerator_VB(ParsedFile parsedFile) : base(parsedFile) { }
+        internal HelperClassGenerator_VB(IParsedFile parsedFile) : base(parsedFile) { }
 
         protected override CodeStatementCollection GetClassLoaderMethodStatements()
         {
@@ -162,7 +162,7 @@ namespace XSDCustomToolVSIX.Language_Specific_Overrides
 
     internal class ParsedFile_VB : ParsedFile
     {
-        internal ParsedFile_VB(XSD_Instance xsd) : base(xsd) { }      
+        internal ParsedFile_VB(IFileGenerator fileGenerator) : base(fileGenerator) { }
 
         #region < ReadInClassFile >
 

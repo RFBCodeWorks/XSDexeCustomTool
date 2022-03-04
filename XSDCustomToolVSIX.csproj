@@ -57,6 +57,12 @@
     </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FileGenerator.cs" />
+    <Compile Include="Interfaces\ICodeGenerator_HelperClass.cs" />
+    <Compile Include="Interfaces\ICodeGenerator_SupplementFile.cs" />
+    <Compile Include="Interfaces\IFileGenerator.cs" />
+    <Compile Include="Interfaces\IParsedFile.cs" />
+    <Compile Include="Base Classes\XSD_Reader.cs" />
     <Compile Include="Interfaces\ICodeDomObjectProvider.cs" />
     <Compile Include="CodeGeneratorRegistrationAttribute.cs" />
     <Compile Include="Enums.cs" />
@@ -71,7 +77,7 @@
     <Compile Include="Base Classes\CodeGenerator_HelperClass.cs" />
     <Compile Include="Base Classes\CodeGenerator_Base.cs" />
     <Compile Include="Interfaces\ILinqClassGenerator.cs" />
-    <Compile Include="Interfaces\IClassGenerator.cs" />
+    <Compile Include="Interfaces\ICodeGenerator.cs" />
     <Compile Include="Language Specific Overrides\LinqOverrides_CSharp.cs" />
     <Compile Include="Language Specific Overrides\Overrides_JSharp.cs" />
     <Compile Include="Language Specific Overrides\Overrides_JS.cs" />

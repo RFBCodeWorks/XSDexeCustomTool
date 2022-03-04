@@ -32,11 +32,11 @@ namespace XSDCustomToolVSIX.BaseClasses
                     case true when member.GetType() == typeof(CodeMemberProperty):
                         //Add the Property to the ClassProperty list
                         CodeMemberProperty prop = (CodeMemberProperty)member;
-                        ClassProperties.Add(ParsedFile.CodeDomObjectProvider.DiscoveredPropertyGenerator(prop, TryGetBackingField(prop), this));
+                        ClassProperties.Add(ParsedFile.DiscoveredPropertyGenerator(prop, TryGetBackingField(prop), this));
                         break;
                     case true when !HasProperties && member.GetType() == typeof(CodeMemberField):
                         //Add the Field to the ClassProperty list, since it should be a public field
-                        ClassProperties.Add(ParsedFile.CodeDomObjectProvider.DiscoveredPropertyGenerator(null, (CodeMemberField)member, this));
+                        ClassProperties.Add(ParsedFile.DiscoveredPropertyGenerator(null, (CodeMemberField)member, this));
                         break;
                     case true when member.GetType() == typeof(CodeMemberMethod):
                         //Currently Ignored
